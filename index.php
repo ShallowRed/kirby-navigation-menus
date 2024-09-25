@@ -4,7 +4,7 @@ Kirby::plugin('shallowred/navigation-menus', [
 
   'collections' => [
     'navigation-menus' => function () {
-      return option('shallowred.navigation-menus.menus');
+      return option('vv.navigation-menus.menus');
     },
   ],
 
@@ -33,6 +33,9 @@ Kirby::plugin('shallowred/navigation-menus', [
 
     'navigationProps' => function ($key) {
       $menu = collection('navigation-menus')[$key] ?? null;
+      if (!$menu) {
+        return null;
+      }
       $navPages = $this->navPages($key);
       return [
         'navPages' => $navPages ?? null,
