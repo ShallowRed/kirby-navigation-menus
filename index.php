@@ -62,14 +62,14 @@ Kirby::plugin('shallowred/navigation-menus', [
         $text = $link->value();
       }
 
-      $isCurrent = $currentPage->isCurrentPage($navPage);
+      $isCurrent = $currentPage->isCurrentPage($navPage) || param('from') === $link->toUrl();
 
       return Html::a(
         $link->toUrl(),
         [$icon . Html::span($text)],
         [
           'aria-current' => $isCurrent ? 'page' : null,
-          'tabindex' => $isCurrent ? '-1' : null,
+          'tabindex' => $isCurrent ? '-1' : "0",
         ],
       );
     }
