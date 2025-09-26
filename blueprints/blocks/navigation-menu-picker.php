@@ -2,7 +2,7 @@
 
 return function () {
 
-  foreach (collection('navigation-menus') as $key => $menu) {
+  foreach (collection('declared-navigation-menus') as $key => $menu) {
     $options[$key] = [
       'text' => $menu['label'],
       'value' => $key,
@@ -11,7 +11,7 @@ return function () {
 
   return [
     'name' => 'Menu de navigation',
-    'icon' => 'sitemap',
+    'icon' => 'menu',
     'preview' => 'fields',
     'wysiwyg' => true,
     'fields' => [

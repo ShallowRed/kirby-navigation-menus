@@ -1,49 +1,61 @@
 <?php
 
+require_once __DIR__ . '/models/navigation-menu-definer.php';
+require_once __DIR__ . '/models/navigation-menu-picker.php';
+
 Kirby::plugin('shallowred/navigation-menus', [
 
   'collections' => [
-    'navigation-menus' => function () {
-      return option('shallowred.navigation-menus.menus');
+    'declared-navigation-menus' => function () {
+      return option('shallowred.navigation-menus.declared-navigation-menus');
     },
   ],
 
   'blueprints' => [
-    'blocks/navigation-menu' => include __DIR__ . '/blueprints/blocks/navigation-menu.php',
-    'sections/navigation-menus' => include __DIR__ . '/blueprints/sections/navigation-menus.php',
+    'blocks/navigation-menu-definer' => __DIR__ . '/blueprints/blocks/navigation-menu-definer.yml',
+    'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
+    'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
+    'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
   ],
 
   'snippets' => [
-    'blocks/navigation-menu' => __DIR__ . '/snippets/blocks/navigation-menu.php',
-    'navigation-menu' => __DIR__ . '/snippets/navigation-menu.php',
+    'blocks/navigation-menu-picker' => __DIR__ . '/snippets/blocks/navigation-menu-picker.php',
+    'blocks/navigation-menu-definer' => __DIR__ . '/snippets/blocks/navigation-menu-definer.php',
+    'nav-items/dropdown' => __DIR__ . '/snippets/nav-items/dropdown.php',
+    'nav-items/link' => __DIR__ . '/snippets/nav-items/link.php',
+    'nav-items/link.controller' => __DIR__ . '/snippets/nav-items/link.controller.php',
+    'nav-items/button' => __DIR__ . '/snippets/nav-items/button.php',
+    'nav-items/button.controller' => __DIR__ . '/snippets/nav-items/button.controller.php',
+  ],
+
+
+  'blockModels' => [
+    'navigation-menu-definer' => NavMenuDefinerBlock::class,
+    'navigation-menu-picker' => NavMenuPickerBlock::class,
   ],
 
   'siteMethods' => [
 
-    'navPages' => function ($key) {
-      $menu = collection('navigation-menus')[$key] ?? null;
+    'getMenu' => function ($key) {
+      $menu = collection('declared-navigation-menus')[$key] ?? null;
       if (is_array($menu) && isset($menu['name'])) {
         $navPages = $this->content()->get($menu['name']);
-          if ($navPages) {
-            return $navPages->toStructure();
-          }
+        if ($navPages) {
+          return $navPages;
+        }
         }
       return null;
     },
 
-    'navigationProps' => function ($key) {
-      $menu = collection('navigation-menus')[$key] ?? null;
-      if (!$menu) {
-        return null;
-      }
-      $navPages = $this->navPages($key);
-      return [
-        'navPages' => $navPages ?? null,
-        'attrs' => [
-          'id' => $menu['id'],
-          'aria-label' => $menu['ariaLabel'],
-        ],
-      ];
+    'navPages' => function ($key) {
+      $menu = collection('declared-navigation-menus')[$key] ?? null;
+      if (is_array($menu) && isset($menu['name'])) {
+        $navPages = $this->content()->get($menu['name']);
+          if ($navPages) {
+            return $navPages->toBlocks();
+          }
+        }
+      return null;
     },
 
     'renderNavItem' => function ($navPage, $currentPage) {

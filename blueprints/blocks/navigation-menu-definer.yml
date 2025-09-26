@@ -1,0 +1,40 @@
+name: Menu de navigation
+icon: menu
+preview: fields
+wysiwyg: true
+fields:
+  brand:
+    label: Bloc identité
+    type: blocks
+    fieldsets:
+      - text
+      - image
+      - site-logo
+  items:
+    extends: fields/nav-items
+  ariaLabel:
+    required: true
+    width: 1/2
+    label: Libellé accessible
+    help: Décrivez le rôle du menu pour les utilisateurs non-voyants
+    type: text
+    default: Menu de navigation
+  id:
+    width: 1/2
+    label: Identifiant
+    type: text
+  breadcrumb:
+    width: 1/2
+    label: Fil d'Ariane
+    type: toggle
+    default: false
+  layout:
+    width: 1/2
+    label: Disposition
+    type: select
+    default: horizontal
+    when:
+      breadcrumb: false
+    options:
+      horizontal: Horizontale
+      vertical: Verticale

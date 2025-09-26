@@ -1,0 +1,46 @@
+label: Éléments de navigation
+type: structure
+fields:
+  text:
+    label: Texte
+    help: Optionnel, utilise le nom de la page ou l'url si vide
+    type: text
+  type:
+    label: Type
+    type: select
+    options:
+      link: Lien simple
+      button: Bouton
+      dropdown: Menu déroulant
+  link:
+    label: Lien
+    type: link
+    width: 1/2
+    options:
+      - page
+      - url
+      - anchor
+  target:
+    label: Ouvrir dans une nouvelle fenêtre
+    type: toggle
+    width: 1/2
+  variant:
+    when:
+      type: button
+    label: Type de bouton
+    type: select
+    options:
+      default: Défaut
+      primary: Primaire
+      secondary: Secondaire
+      contrast: Contraste
+      outline: Contour
+    default: default
+    width: 1/2
+  items:
+    when:
+      type: dropdown
+    label: Éléments
+    extends: fields/nav-items
+    fields:
+      items: false
