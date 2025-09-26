@@ -1,5 +1,9 @@
 label: Éléments de navigation
 type: structure
+# columns:
+#   - text: true
+#   - link: true
+#   - type: true
 fields:
   text:
     label: Texte

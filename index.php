@@ -1,5 +1,7 @@
 <?php
 
+use Kirby\Uuid\Uuid;
+
 require_once __DIR__ . '/models/navigation-menu-definer.php';
 require_once __DIR__ . '/models/navigation-menu-picker.php';
 
@@ -16,6 +18,10 @@ Kirby::plugin('shallowred/navigation-menus', [
     'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
     'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
     'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
+  ],
+
+  'templates' => [
+    'static-menu' => __DIR__ . '/templates/static-menu.php',
   ],
 
   'snippets' => [
@@ -43,7 +49,7 @@ Kirby::plugin('shallowred/navigation-menus', [
         if ($navPages) {
           return $navPages;
         }
-        }
+      }
       return null;
     },
 
@@ -51,10 +57,10 @@ Kirby::plugin('shallowred/navigation-menus', [
       $menu = collection('declared-navigation-menus')[$key] ?? null;
       if (is_array($menu) && isset($menu['name'])) {
         $navPages = $this->content()->get($menu['name']);
-          if ($navPages) {
-            return $navPages->toBlocks();
-          }
+        if ($navPages) {
+          return $navPages->toBlocks();
         }
+      }
       return null;
     },
 
@@ -77,12 +83,12 @@ Kirby::plugin('shallowred/navigation-menus', [
       $isCurrent = $currentPage->isCurrentPage($navPage) || param('from') === $link->toUrl();
 
       return Html::a(
-        $link->toUrl(),
-        [$icon . Html::span($text)],
-        [
-          'aria-current' => $isCurrent ? 'page' : null,
-          'tabindex' => $isCurrent ? '-1' : "0",
-        ],
+          $link->toUrl(),
+          [$icon . Html::span($text)],
+          [
+            'aria-current' => $isCurrent ? 'page' : null,
+            'tabindex' => $isCurrent ? '-1' : "0",
+          ],
       );
     }
   ],
@@ -153,4 +159,22 @@ Kirby::plugin('shallowred/navigation-menus', [
       return $this->nextInMenu($key) !== null;
     },
   ],
+
+  'routes' => [
+    [
+      'pattern' => 'menu',
+      'action'  => function () {
+          return Page::factory([
+            'slug' => 'static-menu',
+            'template' => 'static-menu',
+            'model' => 'static-menu',
+            'content' => [
+              'title' => 'Menu statique',
+              'uuid'  => Uuid::generate(),
+            ]
+          ]);
+      }
+    ]
+  ],
+
 ]);

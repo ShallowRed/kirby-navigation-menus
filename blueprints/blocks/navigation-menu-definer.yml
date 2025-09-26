@@ -1,4 +1,4 @@
-name: Menu de navigation
+name: Definir un menu de navigation
 icon: menu
 preview: fields
 wysiwyg: true
@@ -19,10 +19,15 @@ fields:
     help: Décrivez le rôle du menu pour les utilisateurs non-voyants
     type: text
     default: Menu de navigation
+  hasNavToggler:
+    width: 1/2
+    label: Utiliser un bouton de navigation en mode mobile
+    type: toggle
   id:
     width: 1/2
     label: Identifiant
-    type: text
+    type: slug
+    help: L'identifiant doit être unique
   breadcrumb:
     width: 1/2
     label: Fil d'Ariane

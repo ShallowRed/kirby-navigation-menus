@@ -10,7 +10,7 @@ return function () {
   }
 
   return [
-    'name' => 'Menu de navigation',
+    'name' => 'Réutiliser un menu de navigation global',
     'icon' => 'menu',
     'preview' => 'fields',
     'wysiwyg' => true,

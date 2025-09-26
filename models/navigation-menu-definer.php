@@ -1,5 +1,7 @@
 <?php
 
+use Kirby\Http\Query;
+
 class NavMenuDefinerBlock extends \Kirby\Cms\Block
 {
   public function isBreadcrumb(): bool
@@ -28,5 +30,42 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
     $attrs['aria-label'] = $ariaLabel;
 
     return $attrs;
+  }
+
+  public function hasNavToggler(): bool
+  {
+    return $this->content()->hasNavToggler()->toBool();
+  }
+
+  public function navTogglerAttrs(): array
+  {
+    $attrs = [];
+
+    $menuHref = get('from');
+    if (!isset($menuHref)) {
+      $params = new Query([
+        'from' => page()->url(),
+      ]);
+      $menuHref = '/menu/?' . $params->toString();
+    }
+
+    $attrs['href'] = $menuHref;
+    $attrs['role'] = 'button';
+    $attrs['id'] = 'nav-toggler';
+    $attrs['class'] = 'nav-toggler button outline';
+    $attrs['aria-label'] = 'Ouvrir le menu de navigation';
+    $attrs['aria-haspopup'] = 'true';
+    $attrs['aria-controls'] = 'main-nav';
+    $attrs['tabindex'] = '0';
+
+    return $attrs;
+  }
+  public function menuIconClosed()
+  {
+    return 'Menu';
+  }
+  public function menuIconOpen()
+  {
+    return 'Fermer';
   }
 }
