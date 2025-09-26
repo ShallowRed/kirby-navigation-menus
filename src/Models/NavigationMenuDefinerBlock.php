@@ -32,12 +32,10 @@ class NavigationMenuDefinerBlock extends Block
         if ($this->isBreadcrumb()) {
             return 'horizontal';
         }
-
+        
         $defaultLayout = Config::getDefault('layout') ?? 'horizontal';
-        return $this->content()->layout()->or($defaultLayout);
-    }
-
-    /**
+        return $this->content()->layout()->or($defaultLayout)->toString();
+    }    /**
      * Get the wrapper element type
      */
     public function wrapper(): string
@@ -65,7 +63,7 @@ class NavigationMenuDefinerBlock extends Block
             $translationDefault = t('shallowred.navigation-menus.field.aria-label.default');
             $defaultAriaLabel = $configDefault ?: $translationDefault;
 
-            $ariaLabel = strip_tags($this->content()->ariaLabel()->or($defaultAriaLabel));
+            $ariaLabel = strip_tags($this->content()->ariaLabel()->or($defaultAriaLabel)->toString());
 
             if ($this->isBreadcrumb()) {
                 $ariaLabel = t('shallowred.navigation-menus.breadcrumb.aria-label');
@@ -81,7 +79,7 @@ class NavigationMenuDefinerBlock extends Block
 
         // Add ID for mobile navigation
         if ($this->hasNavToggler()) {
-            $navId = $this->content()->navId()->or('main-nav');
+            $navId = $this->content()->navId()->or('main-nav')->toString();
             $attrs['id'] = htmlspecialchars($navId, ENT_QUOTES, 'UTF-8');
         }
 
@@ -118,7 +116,7 @@ class NavigationMenuDefinerBlock extends Block
 
         // Accessibility
         if (Config::getAccessibility()['aria-expanded']) {
-            $attrs['aria-controls'] = $this->content()->navId()->or('main-nav');
+            $attrs['aria-controls'] = $this->content()->navId()->or('main-nav')->toString();
         }
 
         // Screen reader text
@@ -134,7 +132,7 @@ class NavigationMenuDefinerBlock extends Block
      */
     public function menuIconClosed(): string
     {
-        $defaultIcon = $this->content()->menuIconClosed()->or('☰');
+        $defaultIcon = $this->content()->menuIconClosed()->or('☰')->toString();
         return htmlspecialchars($defaultIcon, ENT_QUOTES, 'UTF-8');
     }
 
@@ -143,7 +141,7 @@ class NavigationMenuDefinerBlock extends Block
      */
     public function menuIconOpen(): string
     {
-        $defaultIcon = $this->content()->menuIconOpen()->or('✕');
+        $defaultIcon = $this->content()->menuIconOpen()->or('✕')->toString();
         return htmlspecialchars($defaultIcon, ENT_QUOTES, 'UTF-8');
     }
 
@@ -227,7 +225,7 @@ class NavigationMenuDefinerBlock extends Block
 
         return [
             'show_home' => Config::getDefault('show-home-link') ?? true,
-            'separator' => $this->content()->breadcrumbSeparator()->or('›'),
+            'separator' => $this->content()->breadcrumbSeparator()->or('›')->toString(),
             'show_current' => $this->content()->showCurrentInBreadcrumb()->toBool(true),
         ];
     }

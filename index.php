@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 /**
  * Kirby Navigation Menus Plugin
- * 
+ *
  * A powerful and flexible navigation menu system for Kirby CMS
  * with advanced features and comprehensive configuration options.
- * 
+ *
  * @package ShallowRed\NavigationMenus
  * @author  ShallowRed
  * @license MIT
@@ -30,14 +30,6 @@ spl_autoload_register(function (string $class): void {
         }
     }
 });
-
-// Load legacy model files for backwards compatibility
-if (file_exists(__DIR__ . '/models/navigation-menu-definer.php')) {
-    require_once __DIR__ . '/models/navigation-menu-definer.php';
-}
-if (file_exists(__DIR__ . '/models/navigation-menu-picker.php')) {
-    require_once __DIR__ . '/models/navigation-menu-picker.php';
-}
 
 Kirby::plugin('shallowred/navigation-menus', [
 
@@ -269,13 +261,4 @@ Kirby::plugin('shallowred/navigation-menus', [
     ],
 ]);
 
-/**
- * Register legacy class aliases for backwards compatibility
- */
-if (!class_exists('NavMenuDefinerBlock', false)) {
-    class_alias(NavigationMenuDefinerBlock::class, 'NavMenuDefinerBlock');
-}
-
-if (!class_exists('NavMenuPickerBlock', false)) {
-    class_alias(NavigationMenuPickerBlock::class, 'NavMenuPickerBlock');
-}
+// Plugin uses modern namespaced classes with PSR-4 autoloading
