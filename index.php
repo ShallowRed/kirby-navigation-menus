@@ -43,112 +43,300 @@ Kirby::plugin('shallowred/navigation-menus', [
   'siteMethods' => [
 
     'getMenu' => function ($key) {
-      $menu = collection('declared-navigation-menus')[$key] ?? null;
-      if (is_array($menu) && isset($menu['name'])) {
+      // Validate input
+      if (empty($key) || !is_string($key)) {
+        return null;
+      }
+
+      try {
+        $declaredMenus = collection('declared-navigation-menus');
+        if (!$declaredMenus || !is_array($declaredMenus)) {
+          return null;
+        }
+
+        $menu = $declaredMenus[$key] ?? null;
+        if (!is_array($menu) || !isset($menu['name']) || empty($menu['name'])) {
+          return null;
+        }
+
         $navPages = $this->content()->get($menu['name']);
-        if ($navPages) {
+        if ($navPages && $navPages->isNotEmpty()) {
           return $navPages;
         }
+      } catch (Exception $e) {
+        // Log error in development mode
+        if (option('debug', false)) {
+          error_log("Navigation menu error for key '{$key}': " . $e->getMessage());
+        }
       }
+
       return null;
     },
 
     'navPages' => function ($key) {
-      $menu = collection('declared-navigation-menus')[$key] ?? null;
-      if (is_array($menu) && isset($menu['name'])) {
+      // Validate input
+      if (empty($key) || !is_string($key)) {
+        return null;
+      }
+
+      try {
+        $declaredMenus = collection('declared-navigation-menus');
+        if (!$declaredMenus || !is_array($declaredMenus)) {
+          return null;
+        }
+
+        $menu = $declaredMenus[$key] ?? null;
+        if (!is_array($menu) || !isset($menu['name']) || empty($menu['name'])) {
+          return null;
+        }
+
         $navPages = $this->content()->get($menu['name']);
-        if ($navPages) {
+        if ($navPages && $navPages->isNotEmpty()) {
           return $navPages->toBlocks();
         }
+      } catch (Exception $e) {
+        // Log error in development mode
+        if (option('debug', false)) {
+          error_log("Navigation pages error for key '{$key}': " . $e->getMessage());
+        }
       }
+
       return null;
     },
 
     'renderNavItem' => function ($navPage, $currentPage) {
-      $icon = !$currentPage->isCurrentPage($navPage)
-        ? ''
-        : Html::tag('span', '', ['class' => 'current-page-icon']);
-
-      $link = $navPage->content()->link();
-      $text = $navPage->content()->text()->value();
-
-      if (empty($text) === true) {
-        $text = $this->pages()->find($link)?->title();
+      // Validate inputs
+      if (!$navPage || !$currentPage) {
+        return '';
       }
 
-      if (empty($text) === true) {
-        $text = $link->value();
+      try {
+        $icon = !$currentPage->isCurrentPage($navPage)
+          ? ''
+          : Html::tag('span', '', ['class' => 'current-page-icon']);
+
+        $link = $navPage->content()->link();
+        if (!$link) {
+          return '';
+        }
+
+        // Sanitize text content
+        $text = strip_tags($navPage->content()->text()->value());
+
+        if (empty($text) === true) {
+          $linkedPage = $this->pages()->find($link);
+          $text = $linkedPage ? strip_tags($linkedPage->title()->value()) : '';
+        }
+
+        if (empty($text) === true) {
+          $linkValue = $link->value();
+          // Basic URL validation and sanitization
+          if (filter_var($linkValue, FILTER_VALIDATE_URL) || strpos($linkValue, 'page://') === 0) {
+            $text = htmlspecialchars($linkValue, ENT_QUOTES, 'UTF-8');
+          } else {
+            return ''; // Invalid link
+          }
+        }
+
+        $linkUrl = $link->toUrl();
+
+        // Validate URL to prevent XSS
+        if (!$this->isValidUrl($linkUrl)) {
+          return '';
+        }
+
+        $isCurrent = $currentPage->isCurrentPage($navPage) || param('from') === $linkUrl;
+
+        return Html::a(
+            $linkUrl,
+            [$icon . Html::span(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'))],
+            [
+              'aria-current' => $isCurrent ? 'page' : null,
+              'tabindex' => $isCurrent ? '-1' : "0",
+            ],
+        );
+      } catch (Exception $e) {
+        if (option('debug', false)) {
+          error_log("Render nav item error: " . $e->getMessage());
+        }
+        return '';
+      }
+    },
+
+    'isValidUrl' => function ($url) {
+      // Allow internal Kirby URLs, relative URLs, and valid external URLs
+      if (empty($url)) {
+        return false;
       }
 
-      $isCurrent = $currentPage->isCurrentPage($navPage) || param('from') === $link->toUrl();
+      // Allow relative URLs and anchors
+      if (strpos($url, '/') === 0 || strpos($url, '#') === 0) {
+        return true;
+      }
 
-      return Html::a(
-          $link->toUrl(),
-          [$icon . Html::span($text)],
-          [
-            'aria-current' => $isCurrent ? 'page' : null,
-            'tabindex' => $isCurrent ? '-1' : "0",
-          ],
-      );
+      // Allow page:// protocol for Kirby internal links
+      if (strpos($url, 'page://') === 0) {
+        return true;
+      }
+
+      // Validate external URLs and block dangerous protocols
+      $parsed = parse_url($url);
+      if (!$parsed || !isset($parsed['scheme'])) {
+        return false;
+      }
+
+      $allowedSchemes = ['http', 'https', 'mailto', 'tel'];
+      return in_array(strtolower($parsed['scheme']), $allowedSchemes);
     }
   ],
 
   'pageMethods' => [
 
     'isCurrentPage' => function ($navItem) {
-      $page = page($navItem->link());
-      return $this->slug() === $page->slug();
+      try {
+        if (!$navItem || !$navItem->link()) {
+          return false;
+        }
+
+        $page = page($navItem->link());
+        if (!$page) {
+          return false;
+        }
+
+        return $this->slug() === $page->slug();
+      } catch (Exception $e) {
+        if (option('debug', false)) {
+          error_log("isCurrentPage error: " . $e->getMessage());
+        }
+        return false;
+      }
     },
 
     'isInMenu' => function ($key) {
-      $navPages = site()->navPages($key) ?? null;
-      if (!$navPages) {
+      try {
+        // Validate input
+        if (empty($key) || !is_string($key)) {
+          return false;
+        }
+
+        $navPages = site()->navPages($key);
+        if (!$navPages || $navPages->count() === 0) {
+          return false;
+        }
+
+        // Check if current page has UUID
+        $currentUuid = $this->content()->uuid();
+        if (!$currentUuid || $currentUuid->isEmpty()) {
+          return false;
+        }
+
+        $plucked = A::map($navPages->pluck('link'), function ($link) {
+          return $link ? $link->value() : '';
+        });
+
+        // Remove empty values
+        $plucked = array_filter($plucked);
+
+        $uuid = 'page://' . $currentUuid->value();
+        return in_array($uuid, $plucked);
+      } catch (Exception $e) {
+        if (option('debug', false)) {
+          error_log("isInMenu error for key '{$key}': " . $e->getMessage());
+        }
         return false;
       }
-      $plucked = A::map($navPages->pluck('link'), function ($link) {
-        return $link->value();
-      });
-      $uuid = 'page://' . $this->content()->uuid()->value();
-      $isInMenu = in_array($uuid, $plucked);
-      return $isInMenu;
     },
 
     'prevInMenu' => function ($key) {
-      $navPages = site()->navPages($key) ?? null;
-      if (!$navPages) {
+      try {
+        // Validate input
+        if (empty($key) || !is_string($key)) {
+          return null;
+        }
+
+        $navPages = site()->navPages($key);
+        if (!$navPages || $navPages->count() === 0) {
+          return null;
+        }
+
+        // Check if current page has UUID
+        $currentUuid = $this->content()->uuid();
+        if (!$currentUuid || $currentUuid->isEmpty()) {
+          return null;
+        }
+
+        $plucked = A::map($navPages->pluck('link'), function ($link) {
+          return $link ? $link->value() : '';
+        });
+
+        // Remove empty values
+        $plucked = array_filter($plucked);
+
+        $uuid = 'page://' . $currentUuid->value();
+        $index = array_search($uuid, $plucked);
+
+        if ($index === false || $index === 0) {
+          return null;
+        }
+
+        $prevItem = $navPages->nth($index - 1);
+        if (!$prevItem || !$prevItem->link()) {
+          return null;
+        }
+
+        return page($prevItem->link());
+      } catch (Exception $e) {
+        if (option('debug', false)) {
+          error_log("prevInMenu error for key '{$key}': " . $e->getMessage());
+        }
         return null;
       }
-
-      $plucked = A::map($navPages->pluck('link'), function ($link) {
-        return $link->value();
-      });
-      $uuid = 'page://' . $this->content()->uuid()->value();
-      $index = array_search($uuid, $plucked);
-
-      if ($index === 0) {
-        return null;
-      }
-
-      return page($navPages->nth($index - 1)->link());
     },
 
     'nextInMenu' => function ($key) {
-      $navPages = site()->navPages($key) ?? null;
-      if (!$navPages) {
+      try {
+        // Validate input
+        if (empty($key) || !is_string($key)) {
+          return null;
+        }
+
+        $navPages = site()->navPages($key);
+        if (!$navPages || $navPages->count() === 0) {
+          return null;
+        }
+
+        // Check if current page has UUID
+        $currentUuid = $this->content()->uuid();
+        if (!$currentUuid || $currentUuid->isEmpty()) {
+          return null;
+        }
+
+        $plucked = A::map($navPages->pluck('link'), function ($link) {
+          return $link ? $link->value() : '';
+        });
+
+        // Remove empty values
+        $plucked = array_filter($plucked);
+
+        $uuid = 'page://' . $currentUuid->value();
+        $index = array_search($uuid, $plucked);
+
+        if ($index === false || $index >= $navPages->count() - 1) {
+          return null;
+        }
+
+        $nextItem = $navPages->nth($index + 1);
+        if (!$nextItem || !$nextItem->link()) {
+          return null;
+        }
+
+        return page($nextItem->link());
+      } catch (Exception $e) {
+        if (option('debug', false)) {
+          error_log("nextInMenu error for key '{$key}': " . $e->getMessage());
+        }
         return null;
       }
-
-      $plucked = A::map($navPages->pluck('link'), function ($link) {
-        return $link->value();
-      });
-      $uuid = 'page://' . $this->content()->uuid()->value();
-      $index = array_search($uuid, $plucked);
-
-      if ($index === $navPages->count() - 1) {
-        return null;
-      }
-
-      return page($navPages->nth($index + 1)->link());
     },
 
     'hasPrevInMenu' => function ($key) {

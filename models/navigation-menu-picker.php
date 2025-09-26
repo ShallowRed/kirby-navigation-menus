@@ -4,9 +4,21 @@ class NavMenuPickerBlock extends \Kirby\Cms\Block
 {
   public function menu()
   {
-    $key = $this->content()->menu()->value();
-    $menu = site()->getMenu($key);
+    try {
+      $key = $this->content()->menu()->value();
 
-    return $menu;
+      // Validate key
+      if (empty($key) || !is_string($key)) {
+        return null;
+      }
+
+      $menu = site()->getMenu($key);
+      return $menu;
+    } catch (Exception $e) {
+      if (option('debug', false)) {
+        error_log("NavMenuPickerBlock error: " . $e->getMessage());
+      }
+      return null;
+    }
   }
 }

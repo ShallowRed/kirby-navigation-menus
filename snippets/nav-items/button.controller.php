@@ -2,26 +2,55 @@
 
 return function ($item) {
 
+  // Validate item and link
+  if (!$item || !$item->content()->link()) {
+    return [
+      'item' => $item,
+      'link' => '',
+      'buttonAttrs' => [],
+      'text' => 'Invalid button'
+    ];
+  }
+
   $link = $item->content()->link()->toUrl();
+
+  // Validate URL for security
+  if (!site()->isValidUrl($link)) {
+    return [
+      'item' => $item,
+      'link' => $link,
+      'buttonAttrs' => [],
+      'text' => 'Invalid link'
+    ];
+  }
+
   $target = $item->content()->target()->toBool();
-  $text = $item->content()->text()->or($link);
+
+  // Sanitize text content
+  $text = strip_tags($item->content()->text()->value());
+  if (empty($text)) {
+    $text = htmlspecialchars($link, ENT_QUOTES, 'UTF-8');
+  }
 
   $classes = ['button'];
-  $classes[] = $item->content()->style()->value();
-  $cssClasses = implode(' ', $classes);
+  $variant = $item->content()->variant()->value();
+  if (!empty($variant)) {
+    $classes[] = $variant;
+  }
+  $style = $item->content()->style()->value();
+  if (!empty($style)) {
+    $classes[] = $style;
+  }
+  $cssClasses = implode(' ', array_filter($classes));
 
   $buttonAttrs = [
     'href' => $link,
-    'class' => $item->content()->variant()->value(),
+    'class' => $cssClasses,
     'target' => $target ? '_blank' : null,
     'rel' => $target ? 'noopener noreferrer' : null,
-
-    'class' => $cssClasses,
     'role' => 'button',
     'aria-label' => $text,
-  ];
-
-  return compact([
+  ];  return compact([
     'item',
     'link',
     'buttonAttrs',

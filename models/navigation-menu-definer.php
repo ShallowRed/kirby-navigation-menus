@@ -23,11 +23,19 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
   {
     $attrs = [];
 
-    $ariaLabel = $this->content()->ariaLabel()->or('Menu de navigation');
-    if ($this->isBreadcrumb()) {
-      $ariaLabel = 'Fil d\'Ariane';
+    try {
+      // Sanitize aria label
+      $ariaLabel = strip_tags($this->content()->ariaLabel()->or('Menu de navigation'));
+      if ($this->isBreadcrumb()) {
+        $ariaLabel = 'Fil d\'Ariane';
+      }
+      $attrs['aria-label'] = htmlspecialchars($ariaLabel, ENT_QUOTES, 'UTF-8');
+    } catch (Exception $e) {
+      if (option('debug', false)) {
+        error_log("navAttrs error: " . $e->getMessage());
+      }
+      $attrs['aria-label'] = 'Navigation menu';
     }
-    $attrs['aria-label'] = $ariaLabel;
 
     return $attrs;
   }
