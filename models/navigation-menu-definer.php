@@ -1,8 +1,9 @@
 <?php
 
 use Kirby\Http\Query;
+use ShallowRed\NavigationMenus\Models\NavigationMenuDefinerBlock;
 
-class NavMenuDefinerBlock extends \Kirby\Cms\Block
+class NavMenuDefinerBlock extends NavigationMenuDefinerBlock
 {
   public function isBreadcrumb(): bool
   {

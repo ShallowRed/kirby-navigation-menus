@@ -1,22 +1,72 @@
 {
-    "version": "0.1.5",
-	"name": "shallowred/kirby-navigation-menus",
-	"description": "Kirby Example Plugin",
-	"license": "MIT",
-	"type": "kirby-plugin",
-	"authors": [
-		{
-			"name": "Lucas Poulain",
-			"email": "you@example.com"
-		}
-	],
-	"require": {
-		"getkirby/composer-installer": "^1.1",
+    "name": "shallowred/kirby-navigation-menus",
+    "description": "A powerful and flexible navigation menu system for Kirby CMS with advanced features like dropdowns, mobile toggles, breadcrumbs, and comprehensive accessibility support.",
+    "version": "2.0.0",
+    "license": "MIT",
+    "type": "kirby-plugin",
+    "keywords": [
+        "kirby",
+        "plugin",
+        "navigation",
+        "menu",
+        "accessibility",
+        "mobile",
+        "cms"
+    ],
+    "authors": [
+        {
+            "name": "ShallowRed",
+            "email": "contact@shallowred.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/ShallowRed/kirby-navigation-menus",
+    "support": {
+        "issues": "https://github.com/ShallowRed/kirby-navigation-menus/issues",
+        "source": "https://github.com/ShallowRed/kirby-navigation-menus"
+    },
+    "require": {
+        "php": ">=8.1",
+        "getkirby/cms": "^4.0",
+        "getkirby/composer-installer": "^1.1",
         "lukaskleinschmidt/kirby-snippet-controller": "^2.2"
-	},
+    },
+    "require-dev": {
+        "getkirby/cli": "^1.0",
+        "phpunit/phpunit": "^10.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "ShallowRed\\NavigationMenus\\": "src/"
+        },
+        "files": [
+            "index.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "ShallowRed\\NavigationMenus\\Tests\\": "tests/"
+        }
+    },
     "config": {
         "allow-plugins": {
             "getkirby/composer-installer": true
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-html coverage",
+        "lint": "php -l src/"
+    },
+    "extra": {
+        "kirby": {
+            "name": "Navigation Menus",
+            "description": "Advanced navigation system with accessibility and mobile support",
+            "category": "navigation"
         }
     }
 }

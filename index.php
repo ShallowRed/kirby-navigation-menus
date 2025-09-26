@@ -1,421 +1,281 @@
 <?php
 
-use Kirby\Uuid\Uuid;
+declare(strict_types=1);
 
-require_once __DIR__ . '/models/navigation-menu-definer.php';
-require_once __DIR__ . '/models/navigation-menu-picker.php';
+/**
+ * Kirby Navigation Menus Plugin
+ * 
+ * A powerful and flexible navigation menu system for Kirby CMS
+ * with advanced features and comprehensive configuration options.
+ * 
+ * @package ShallowRed\NavigationMenus
+ * @author  ShallowRed
+ * @license MIT
+ */
+
+use Kirby\Cms\App;
+use Kirby\Uuid\Uuid;
+use ShallowRed\NavigationMenus\Models\NavigationMenuDefinerBlock;
+use ShallowRed\NavigationMenus\Models\NavigationMenuPickerBlock;
+use ShallowRed\NavigationMenus\Navigation\NavigationHelper;
+use ShallowRed\NavigationMenus\Utils\Config;
+use ShallowRed\NavigationMenus\Utils\UrlValidator;
+
+// Autoloader for plugin classes
+spl_autoload_register(function (string $class): void {
+    if (str_starts_with($class, 'ShallowRed\\NavigationMenus\\')) {
+        $file = __DIR__ . '/src/' . str_replace(['ShallowRed\\NavigationMenus\\', '\\'], ['', '/'], $class) . '.php';
+        if (file_exists($file)) {
+            require_once $file;
+        }
+    }
+});
+
+// Load legacy model files for backwards compatibility
+if (file_exists(__DIR__ . '/models/navigation-menu-definer.php')) {
+    require_once __DIR__ . '/models/navigation-menu-definer.php';
+}
+if (file_exists(__DIR__ . '/models/navigation-menu-picker.php')) {
+    require_once __DIR__ . '/models/navigation-menu-picker.php';
+}
 
 Kirby::plugin('shallowred/navigation-menus', [
 
-  'options' => [
-    // Default behavior configuration
-    'shallowred.navigation-menus.defaults.aria-label' => null,
-    'shallowred.navigation-menus.defaults.layout' => 'horizontal',
-    'shallowred.navigation-menus.defaults.has-toggler' => false,
-    'shallowred.navigation-menus.defaults.wrapper' => 'nav',
-    'shallowred.navigation-menus.defaults.auto-current-detection' => true,
-    'shallowred.navigation-menus.defaults.button-variant' => 'default',
+    'options' => [
+        // Default behavior configuration
+        'shallowred.navigation-menus.defaults.aria-label' => 'Main navigation',
+        'shallowred.navigation-menus.defaults.layout' => 'horizontal',
+        'shallowred.navigation-menus.defaults.has-toggler' => true,
+        'shallowred.navigation-menus.defaults.wrapper' => 'nav',
+        'shallowred.navigation-menus.defaults.auto-current-detection' => true,
+        'shallowred.navigation-menus.defaults.button-variant' => 'primary',
+        'shallowred.navigation-menus.defaults.breadcrumb' => false,
+        'shallowred.navigation-menus.defaults.show-home-link' => true,
 
-    // CSS & styling configuration
-    'shallowred.navigation-menus.css.current-page-class' => 'current',
-    'shallowred.navigation-menus.css.nav-toggler-class' => 'nav-toggler',
-    'shallowred.navigation-menus.css.dropdown-class' => 'dropdown',
-    'shallowred.navigation-menus.css.mobile-nav-class' => 'mobile-nav',
-    'shallowred.navigation-menus.css.show-current-icon' => true,
-    'shallowred.navigation-menus.css.current-icon-html' => '<span class="current-page-icon" aria-hidden="true"></span>',
+        // CSS & styling configuration
+        'shallowred.navigation-menus.css.current-page-class' => 'current',
+        'shallowred.navigation-menus.css.nav-toggler-class' => 'nav-toggler',
+        'shallowred.navigation-menus.css.dropdown-class' => 'dropdown',
+        'shallowred.navigation-menus.css.mobile-nav-class' => 'mobile-nav',
+        'shallowred.navigation-menus.css.show-current-icon' => false,
+        'shallowred.navigation-menus.css.current-icon-html' => '<span class="current-indicator" aria-hidden="true">→</span>',
+        'shallowred.navigation-menus.css.wrapper-class' => 'navigation-wrapper',
+        'shallowred.navigation-menus.css.list-class' => 'navigation-list',
+        'shallowred.navigation-menus.css.item-class' => 'navigation-item',
+        'shallowred.navigation-menus.css.link-class' => 'navigation-link',
+        'shallowred.navigation-menus.css.button-class' => 'navigation-button',
 
-    // Security & validation
-    'shallowred.navigation-menus.security.allow-external-links' => true,
-    'shallowred.navigation-menus.security.allowed-schemes' => ['https', 'http', 'mailto', 'tel'],
-    'shallowred.navigation-menus.security.max-dropdown-depth' => 2,
-    'shallowred.navigation-menus.security.secure-external-links' => true,
+        // Security & validation
+        'shallowred.navigation-menus.security.allow-external-links' => true,
+        'shallowred.navigation-menus.security.allowed-schemes' => ['https', 'http', 'mailto', 'tel'],
+        'shallowred.navigation-menus.security.max-dropdown-depth' => 2,
+        'shallowred.navigation-menus.security.secure-external-links' => true,
+        'shallowred.navigation-menus.security.validate-urls' => true,
+        'shallowred.navigation-menus.security.sanitize-html' => true,
 
-    // Mobile & accessibility
-    'shallowred.navigation-menus.mobile.breakpoint' => '768px',
-    'shallowred.navigation-menus.mobile.close-on-outside-click' => true,
-    'shallowred.navigation-menus.accessibility.enable-skip-link' => true,
-    'shallowred.navigation-menus.accessibility.skip-link-text' => 'Skip to main content',
-    'shallowred.navigation-menus.accessibility.focus-management' => true,
-    'shallowred.navigation-menus.accessibility.aria-expanded' => true,
+        // Mobile & accessibility
+        'shallowred.navigation-menus.mobile.breakpoint' => '768px',
+        'shallowred.navigation-menus.mobile.close-on-outside-click' => true,
+        'shallowred.navigation-menus.mobile.enable-touch-gestures' => true,
+        'shallowred.navigation-menus.mobile.menu-direction' => 'left',
 
-    // Developer experience
-    'shallowred.navigation-menus.debug.dev-warnings' => false,
-    'shallowred.navigation-menus.debug.log-errors' => true,
-    'shallowred.navigation-menus.debug.html-comments' => false,
-  ],
+        'shallowred.navigation-menus.accessibility.enable-skip-link' => false,
+        'shallowred.navigation-menus.accessibility.skip-link-text' => 'Skip to main content',
+        'shallowred.navigation-menus.accessibility.focus-management' => true,
+        'shallowred.navigation-menus.accessibility.aria-expanded' => true,
+        'shallowred.navigation-menus.accessibility.screen-reader-text' => true,
+        'shallowred.navigation-menus.accessibility.keyboard-navigation' => true,
 
-  'translations' => [
-    'en' => require_once __DIR__ . '/translations/en.php',
-    'fr' => require_once __DIR__ . '/translations/fr.php',
-  ],
+        // Developer experience & debugging
+        'shallowred.navigation-menus.debug.dev-warnings' => false,
+        'shallowred.navigation-menus.debug.log-errors' => false,
+        'shallowred.navigation-menus.debug.show-performance' => false,
+        'shallowred.navigation-menus.debug.validate-structure' => false,
 
-  'collections' => [
-    'declared-navigation-menus' => function () {
-      return option('shallowred.navigation-menus.declared-navigation-menus');
-    },
-  ],
+        // Declared navigation menus
+        'shallowred.navigation-menus.declared-navigation-menus' => [],
+    ],
 
-  'blueprints' => [
-    'blocks/navigation-menu-definer' => __DIR__ . '/blueprints/blocks/navigation-menu-definer.yml',
-    'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
-    'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
-    'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
-  ],
+    'translations' => [
+        'en' => require_once __DIR__ . '/translations/en.php',
+        'fr' => require_once __DIR__ . '/translations/fr.php',
+    ],
 
-  'templates' => [
-    'static-menu' => __DIR__ . '/templates/static-menu.php',
-  ],
+    'collections' => [
+        'declared-navigation-menus' => function (): array {
+            return Config::getDeclaredMenus();
+        },
+    ],
 
-  'snippets' => [
-    'blocks/navigation-menu-picker' => __DIR__ . '/snippets/blocks/navigation-menu-picker.php',
-    'blocks/navigation-menu-definer' => __DIR__ . '/snippets/blocks/navigation-menu-definer.php',
-    'nav-items/dropdown' => __DIR__ . '/snippets/nav-items/dropdown.php',
-    'nav-items/link' => __DIR__ . '/snippets/nav-items/link.php',
-    'nav-items/link.controller' => __DIR__ . '/snippets/nav-items/link.controller.php',
-    'nav-items/button' => __DIR__ . '/snippets/nav-items/button.php',
-    'nav-items/button.controller' => __DIR__ . '/snippets/nav-items/button.controller.php',
-  ],
+    'blueprints' => [
+        'blocks/navigation-menu-definer' => __DIR__ . '/blueprints/blocks/navigation-menu-definer.yml',
+        'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
+        'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
+        'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
+    ],
 
+    'templates' => [
+        'static-menu' => __DIR__ . '/templates/static-menu.php',
+    ],
 
-  'blockModels' => [
-    'navigation-menu-definer' => NavMenuDefinerBlock::class,
-    'navigation-menu-picker' => NavMenuPickerBlock::class,
-  ],
+    'snippets' => [
+        'blocks/navigation-menu-picker' => __DIR__ . '/snippets/blocks/navigation-menu-picker.php',
+        'blocks/navigation-menu-definer' => __DIR__ . '/snippets/blocks/navigation-menu-definer.php',
+        'nav-items/dropdown' => __DIR__ . '/snippets/nav-items/dropdown.php',
+        'nav-items/link' => __DIR__ . '/snippets/nav-items/link.php',
+        'nav-items/link.controller' => __DIR__ . '/src/Controllers/LinkController.php',
+        'nav-items/button' => __DIR__ . '/snippets/nav-items/button.php',
+        'nav-items/button.controller' => __DIR__ . '/src/Controllers/ButtonController.php',
+    ],
 
-  'siteMethods' => [
+    'blockModels' => [
+        'navigation-menu-definer' => NavigationMenuDefinerBlock::class,
+        'navigation-menu-picker' => NavigationMenuPickerBlock::class,
+    ],
 
-    'getMenu' => function ($key) {
-      // Validate input
-      if (empty($key) || !is_string($key)) {
-        return null;
-      }
+    'siteMethods' => [
+        /**
+         * Get navigation menu by key
+         */
+        'getMenu' => function (string $key): ?\Kirby\Content\Field {
+            return NavigationHelper::getMenu($key);
+        },
 
-      try {
-        $declaredMenus = collection('declared-navigation-menus');
-        if (!$declaredMenus || !is_array($declaredMenus)) {
-          return null;
-        }
+        /**
+         * Get navigation pages as blocks collection
+         */
+        'navPages' => function (string $key): ?object {
+            return NavigationHelper::getNavPages($key);
+        },
 
-        $menu = $declaredMenus[$key] ?? null;
-        if (!is_array($menu) || !isset($menu['name']) || empty($menu['name'])) {
-          return null;
-        }
+        /**
+         * Render a single navigation item
+         */
+        'renderNavItem' => function (object $navPage, \Kirby\Cms\Page $currentPage): string {
+            return NavigationHelper::renderNavItem($navPage, $currentPage);
+        },
 
-        $navPages = $this->content()->get($menu['name']);
-        if ($navPages && $navPages->isNotEmpty()) {
-          return $navPages;
-        }
-      } catch (Exception $e) {
-        // Log error in development mode
-        if (option('debug', false)) {
-          error_log("Navigation menu error for key '{$key}': " . $e->getMessage());
-        }
-      }
+        /**
+         * Validate URL for security
+         */
+        'isValidUrl' => function (?string $url): bool {
+            return UrlValidator::isValid($url);
+        },
 
-      return null;
-    },
+        /**
+         * Generate complete navigation HTML
+         */
+        'renderNavigation' => function (string $menuKey, array $options = []): string {
+            return NavigationHelper::generateNavigationHtml($menuKey, $options);
+        },
 
-    'navPages' => function ($key) {
-      // Validate input
-      if (empty($key) || !is_string($key)) {
-        return null;
-      }
+        /**
+         * Get pages from navigation menu
+         */
+        'getNavMenuPages' => function (string $menuKey): \Kirby\Cms\Pages {
+            return NavigationHelper::getPagesFromMenu($menuKey);
+        },
+    ],
 
-      try {
-        $declaredMenus = collection('declared-navigation-menus');
-        if (!$declaredMenus || !is_array($declaredMenus)) {
-          return null;
-        }
+    'pageMethods' => [
+        /**
+         * Check if page is in navigation menu
+         */
+        'isInMenu' => function (string $menuKey): bool {
+            return NavigationHelper::isPageInMenu($this, $menuKey);
+        },
 
-        $menu = $declaredMenus[$key] ?? null;
-        if (!is_array($menu) || !isset($menu['name']) || empty($menu['name'])) {
-          return null;
-        }
+        /**
+         * Get previous page in navigation menu
+         */
+        'prevInMenu' => function (string $menuKey): ?\Kirby\Cms\Page {
+            return NavigationHelper::getPrevPageInMenu($this, $menuKey);
+        },
 
-        $navPages = $this->content()->get($menu['name']);
-        if ($navPages && $navPages->isNotEmpty()) {
-          return $navPages->toBlocks();
-        }
-      } catch (Exception $e) {
-        // Log error in development mode
-        if (option('debug', false)) {
-          error_log("Navigation pages error for key '{$key}': " . $e->getMessage());
-        }
-      }
+        /**
+         * Get next page in navigation menu
+         */
+        'nextInMenu' => function (string $menuKey): ?\Kirby\Cms\Page {
+            return NavigationHelper::getNextPageInMenu($this, $menuKey);
+        },
 
-      return null;
-    },
+        /**
+         * Check if page has previous page in menu
+         */
+        'hasPrevInMenu' => function (string $menuKey): bool {
+            return NavigationHelper::hasPrevPageInMenu($this, $menuKey);
+        },
 
-    'renderNavItem' => function ($navPage, $currentPage) {
-      // Validate inputs
-      if (!$navPage || !$currentPage) {
-        return '';
-      }
+        /**
+         * Check if page has next page in menu
+         */
+        'hasNextInMenu' => function (string $menuKey): bool {
+            return NavigationHelper::hasNextPageInMenu($this, $menuKey);
+        },
+    ],
 
-      try {
-        // Use configurable current page icon
-        $showCurrentIcon = option('shallowred.navigation-menus.css.show-current-icon', true);
-        $currentIconHtml = option('shallowred.navigation-menus.css.current-icon-html', '<span class="current-page-icon" aria-hidden="true"></span>');
+    'hooks' => [
+        'page.render:before' => function (\Kirby\Cms\Page $page): void {
+            // Performance tracking in debug mode
+            if (Config::getDebug()['show-performance']) {
+                $page->navigationRenderStart = microtime(true);
+            }
+        },
 
-        $icon = !$currentPage->isCurrentPage($navPage) || !$showCurrentIcon
-          ? ''
-          : $currentIconHtml;
+        'page.render:after' => function (\Kirby\Cms\Page $page, string $html): void {
+            // Log performance metrics in debug mode
+            if (Config::getDebug()['show-performance'] && isset($page->navigationRenderStart)) {
+                $renderTime = microtime(true) - $page->navigationRenderStart;
+                error_log("NavigationMenus: Page render time: {$renderTime}s for {$page->url()}");
+            }
+        },
+    ],
 
-        $link = $navPage->content()->link();
-        if (!$link) {
-          return '';
-        }
+    'validators' => [
+        'navigationUrl' => function (string $url): bool {
+            return UrlValidator::isValid($url);
+        },
+    ],
 
-        // Sanitize text content
-        $text = strip_tags($navPage->content()->text()->value());
-
-        if (empty($text) === true) {
-          $linkedPage = $this->pages()->find($link);
-          $text = $linkedPage ? strip_tags($linkedPage->title()->value()) : '';
-        }
-
-        if (empty($text) === true) {
-          $linkValue = $link->value();
-          // Basic URL validation and sanitization
-          if (filter_var($linkValue, FILTER_VALIDATE_URL) || strpos($linkValue, 'page://') === 0) {
-            $text = htmlspecialchars($linkValue, ENT_QUOTES, 'UTF-8');
-          } else {
-            return ''; // Invalid link
-          }
-        }
-
-        $linkUrl = $link->toUrl();
-
-        // Validate URL to prevent XSS
-        if (!$this->isValidUrl($linkUrl)) {
-          return '';
-        }
-
-        $isCurrent = $currentPage->isCurrentPage($navPage) || param('from') === $linkUrl;
-
-        return Html::a(
-            $linkUrl,
-            [$icon . Html::span(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'))],
+    'api' => [
+        'routes' => [
             [
-              'aria-current' => $isCurrent ? 'page' : null,
-              'tabindex' => $isCurrent ? '-1' : "0",
+                'pattern' => 'navigation-menus/validate-config',
+                'method' => 'GET',
+                'action' => function (): array {
+                    $declaredMenus = Config::getDeclaredMenus();
+                    $validation = [];
+
+                    foreach ($declaredMenus as $key => $menu) {
+                        $validation[$key] = [
+                            'exists' => NavigationHelper::getMenu($key) !== null,
+                            'has_items' => NavigationHelper::getNavPages($key) !== null,
+                            'config' => $menu,
+                        ];
+                    }
+
+                    return [
+                        'status' => 'success',
+                        'menus' => $validation,
+                        'config_summary' => [
+                            'total_menus' => count($declaredMenus),
+                            'debug_mode' => Config::isDebugMode(),
+                            'external_links_allowed' => Config::allowExternalLinks(),
+                        ],
+                    ];
+                },
             ],
-        );
-      } catch (Exception $e) {
-        if (option('debug', false)) {
-          error_log("Render nav item error: " . $e->getMessage());
-        }
-        return '';
-      }
-    },
-
-    'isValidUrl' => function ($url) {
-      // Allow internal Kirby URLs, relative URLs, and valid external URLs
-      if (empty($url)) {
-        return false;
-      }
-
-      // Allow relative URLs and anchors
-      if (strpos($url, '/') === 0 || strpos($url, '#') === 0) {
-        return true;
-      }
-
-      // Allow page:// protocol for Kirby internal links
-      if (strpos($url, 'page://') === 0) {
-        return true;
-      }
-
-      // Check if external links are allowed
-      $allowExternal = option('shallowred.navigation-menus.security.allow-external-links', true);
-      if (!$allowExternal) {
-        return false; // Block all external URLs if disabled
-      }
-
-      // Validate external URLs and block dangerous protocols
-      $parsed = parse_url($url);
-      if (!$parsed || !isset($parsed['scheme'])) {
-        return false;
-      }
-
-      // Use configurable allowed schemes
-      $allowedSchemes = option('shallowred.navigation-menus.security.allowed-schemes', ['http', 'https', 'mailto', 'tel']);
-      return in_array(strtolower($parsed['scheme']), $allowedSchemes);
-    }
-  ],
-
-  'pageMethods' => [
-
-    'isCurrentPage' => function ($navItem) {
-      try {
-        if (!$navItem || !$navItem->link()) {
-          return false;
-        }
-
-        $page = page($navItem->link());
-        if (!$page) {
-          return false;
-        }
-
-        return $this->slug() === $page->slug();
-      } catch (Exception $e) {
-        if (option('debug', false)) {
-          error_log("isCurrentPage error: " . $e->getMessage());
-        }
-        return false;
-      }
-    },
-
-    'isInMenu' => function ($key) {
-      try {
-        // Validate input
-        if (empty($key) || !is_string($key)) {
-          return false;
-        }
-
-        $navPages = site()->navPages($key);
-        if (!$navPages || $navPages->count() === 0) {
-          return false;
-        }
-
-        // Check if current page has UUID
-        $currentUuid = $this->content()->uuid();
-        if (!$currentUuid || $currentUuid->isEmpty()) {
-          return false;
-        }
-
-        $plucked = A::map($navPages->pluck('link'), function ($link) {
-          return $link ? $link->value() : '';
-        });
-
-        // Remove empty values
-        $plucked = array_filter($plucked);
-
-        $uuid = 'page://' . $currentUuid->value();
-        return in_array($uuid, $plucked);
-      } catch (Exception $e) {
-        if (option('debug', false)) {
-          error_log("isInMenu error for key '{$key}': " . $e->getMessage());
-        }
-        return false;
-      }
-    },
-
-    'prevInMenu' => function ($key) {
-      try {
-        // Validate input
-        if (empty($key) || !is_string($key)) {
-          return null;
-        }
-
-        $navPages = site()->navPages($key);
-        if (!$navPages || $navPages->count() === 0) {
-          return null;
-        }
-
-        // Check if current page has UUID
-        $currentUuid = $this->content()->uuid();
-        if (!$currentUuid || $currentUuid->isEmpty()) {
-          return null;
-        }
-
-        $plucked = A::map($navPages->pluck('link'), function ($link) {
-          return $link ? $link->value() : '';
-        });
-
-        // Remove empty values
-        $plucked = array_filter($plucked);
-
-        $uuid = 'page://' . $currentUuid->value();
-        $index = array_search($uuid, $plucked);
-
-        if ($index === false || $index === 0) {
-          return null;
-        }
-
-        $prevItem = $navPages->nth($index - 1);
-        if (!$prevItem || !$prevItem->link()) {
-          return null;
-        }
-
-        return page($prevItem->link());
-      } catch (Exception $e) {
-        if (option('debug', false)) {
-          error_log("prevInMenu error for key '{$key}': " . $e->getMessage());
-        }
-        return null;
-      }
-    },
-
-    'nextInMenu' => function ($key) {
-      try {
-        // Validate input
-        if (empty($key) || !is_string($key)) {
-          return null;
-        }
-
-        $navPages = site()->navPages($key);
-        if (!$navPages || $navPages->count() === 0) {
-          return null;
-        }
-
-        // Check if current page has UUID
-        $currentUuid = $this->content()->uuid();
-        if (!$currentUuid || $currentUuid->isEmpty()) {
-          return null;
-        }
-
-        $plucked = A::map($navPages->pluck('link'), function ($link) {
-          return $link ? $link->value() : '';
-        });
-
-        // Remove empty values
-        $plucked = array_filter($plucked);
-
-        $uuid = 'page://' . $currentUuid->value();
-        $index = array_search($uuid, $plucked);
-
-        if ($index === false || $index >= $navPages->count() - 1) {
-          return null;
-        }
-
-        $nextItem = $navPages->nth($index + 1);
-        if (!$nextItem || !$nextItem->link()) {
-          return null;
-        }
-
-        return page($nextItem->link());
-      } catch (Exception $e) {
-        if (option('debug', false)) {
-          error_log("nextInMenu error for key '{$key}': " . $e->getMessage());
-        }
-        return null;
-      }
-    },
-
-    'hasPrevInMenu' => function ($key) {
-      return $this->prevInMenu($key) !== null;
-    },
-
-    'hasNextInMenu' => function ($key) {
-      return $this->nextInMenu($key) !== null;
-    },
-  ],
-
-  'routes' => [
-    [
-      'pattern' => 'menu',
-      'action'  => function () {
-          return Page::factory([
-            'slug' => 'static-menu',
-            'template' => 'static-menu',
-            'model' => 'static-menu',
-            'content' => [
-              'title' => 'Menu statique',
-              'uuid'  => Uuid::generate(),
-            ]
-          ]);
-      }
-    ]
-  ],
-
+        ],
+    ],
 ]);
+
+/**
+ * Register legacy class aliases for backwards compatibility
+ */
+if (!class_exists('NavMenuDefinerBlock', false)) {
+    class_alias(NavigationMenuDefinerBlock::class, 'NavMenuDefinerBlock');
+}
+
+if (!class_exists('NavMenuPickerBlock', false)) {
+    class_alias(NavigationMenuPickerBlock::class, 'NavMenuPickerBlock');
+}

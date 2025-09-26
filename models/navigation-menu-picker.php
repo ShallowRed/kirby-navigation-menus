@@ -1,6 +1,8 @@
 <?php
 
-class NavMenuPickerBlock extends \Kirby\Cms\Block
+use ShallowRed\NavigationMenus\Models\NavigationMenuPickerBlock;
+
+class NavMenuPickerBlock extends NavigationMenuPickerBlock
 {
   public function menu()
   {
