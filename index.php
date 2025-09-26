@@ -15,7 +15,7 @@ Kirby::plugin('shallowred/navigation-menus', [
     'shallowred.navigation-menus.defaults.wrapper' => 'nav',
     'shallowred.navigation-menus.defaults.auto-current-detection' => true,
     'shallowred.navigation-menus.defaults.button-variant' => 'default',
-    
+
     // CSS & styling configuration
     'shallowred.navigation-menus.css.current-page-class' => 'current',
     'shallowred.navigation-menus.css.nav-toggler-class' => 'nav-toggler',
@@ -23,13 +23,13 @@ Kirby::plugin('shallowred/navigation-menus', [
     'shallowred.navigation-menus.css.mobile-nav-class' => 'mobile-nav',
     'shallowred.navigation-menus.css.show-current-icon' => true,
     'shallowred.navigation-menus.css.current-icon-html' => '<span class="current-page-icon" aria-hidden="true"></span>',
-    
+
     // Security & validation
     'shallowred.navigation-menus.security.allow-external-links' => true,
     'shallowred.navigation-menus.security.allowed-schemes' => ['https', 'http', 'mailto', 'tel'],
     'shallowred.navigation-menus.security.max-dropdown-depth' => 2,
     'shallowred.navigation-menus.security.secure-external-links' => true,
-    
+
     // Mobile & accessibility
     'shallowred.navigation-menus.mobile.breakpoint' => '768px',
     'shallowred.navigation-menus.mobile.close-on-outside-click' => true,
@@ -37,7 +37,7 @@ Kirby::plugin('shallowred/navigation-menus', [
     'shallowred.navigation-menus.accessibility.skip-link-text' => 'Skip to main content',
     'shallowred.navigation-menus.accessibility.focus-management' => true,
     'shallowred.navigation-menus.accessibility.aria-expanded' => true,
-    
+
     // Developer experience
     'shallowred.navigation-menus.debug.dev-warnings' => false,
     'shallowred.navigation-menus.debug.log-errors' => true,
@@ -156,7 +156,7 @@ Kirby::plugin('shallowred/navigation-menus', [
         // Use configurable current page icon
         $showCurrentIcon = option('shallowred.navigation-menus.css.show-current-icon', true);
         $currentIconHtml = option('shallowred.navigation-menus.css.current-icon-html', '<span class="current-page-icon" aria-hidden="true"></span>');
-        
+
         $icon = !$currentPage->isCurrentPage($navPage) || !$showCurrentIcon
           ? ''
           : $currentIconHtml;

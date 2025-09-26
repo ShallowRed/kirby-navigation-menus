@@ -14,7 +14,7 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
     if ($this->isBreadcrumb()) {
       return 'horizontal';
     }
-    
+
     $defaultLayout = option('shallowred.navigation-menus.defaults.layout', 'horizontal');
     return $this->content()->layout()->or($defaultLayout);
   }
@@ -22,12 +22,12 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
   public function wrapper(): string
   {
     $defaultWrapper = option('shallowred.navigation-menus.defaults.wrapper', 'nav');
-    
+
     // Override wrapper based on layout for backwards compatibility
     if ($this->layout() === 'vertical') {
       return 'aside';
     }
-    
+
     return $defaultWrapper;
   }
 
@@ -40,9 +40,9 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
       $configDefault = option('shallowred.navigation-menus.defaults.aria-label');
       $translationDefault = t('shallowred.navigation-menus.field.aria-label.default');
       $defaultAriaLabel = $configDefault ?: $translationDefault;
-      
+
       $ariaLabel = strip_tags($this->content()->ariaLabel()->or($defaultAriaLabel));
-      
+
       if ($this->isBreadcrumb()) {
         $ariaLabel = t('shallowred.navigation-menus.breadcrumb.aria-label');
       }
@@ -76,11 +76,11 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
     $attrs['href'] = $menuHref;
     $attrs['role'] = 'button';
     $attrs['id'] = 'nav-toggler';
-    
+
     // Use configurable CSS class
     $togglerClass = option('shallowred.navigation-menus.css.nav-toggler-class', 'nav-toggler');
     $attrs['class'] = $togglerClass . ' button outline';
-    
+
     $attrs['aria-label'] = t('shallowred.navigation-menus.nav-toggler.aria-label');
     $attrs['aria-haspopup'] = 'true';
     $attrs['aria-controls'] = 'main-nav';

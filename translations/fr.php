@@ -45,7 +45,7 @@ return [
     'shallowred.navigation-menus.nav-item.variant.contrast' => 'Contraste',
     'shallowred.navigation-menus.nav-item.variant.outline' => 'Contour',
     'shallowred.navigation-menus.nav-item.items.label' => 'Éléments',
-    
+
     // Configuration help text
     'shallowred.navigation-menus.config.help' => 'Configurez ce plugin dans votre fichier site/config/config.php en utilisant les options shallowred.navigation-menus.',
 ];

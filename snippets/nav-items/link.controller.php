@@ -41,18 +41,18 @@ return function ($item) {
 
   $variant = $item->content()->variant()->value();
   $classes = [];
-  
+
   // Add variant class if specified
   if (!empty($variant)) {
     $classes[] = htmlspecialchars($variant, ENT_QUOTES, 'UTF-8');
   }
-  
+
   // Add current page class if this is the current page
   if ($isCurrentPage) {
     $currentPageClass = option('shallowred.navigation-menus.css.current-page-class', 'current');
     $classes[] = $currentPageClass;
   }
-  
+
   // Handle external links security
   $rel = null;
   if ($isTargetBlank) {
@@ -64,7 +64,7 @@ return function ($item) {
       $rel = 'noopener noreferrer';
     }
   }
-  
+
   $linkAttrs = [
     'href' => $url,
     'class' => !empty($classes) ? implode(' ', $classes) : null,

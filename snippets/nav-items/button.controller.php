@@ -31,7 +31,7 @@ return function ($item) {
   }
 
   $classes = ['button'];
-  
+
   // Use configured default variant if none specified
   $variant = $item->content()->variant()->value();
   if (empty($variant)) {
@@ -40,7 +40,7 @@ return function ($item) {
   if (!empty($variant)) {
     $classes[] = $variant;
   }
-  
+
   $style = $item->content()->style()->value();
   if (!empty($style)) {
     $classes[] = $style;

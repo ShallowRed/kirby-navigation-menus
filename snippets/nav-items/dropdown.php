@@ -1,4 +1,4 @@
-<?php 
+<?php
 $dropdownClass = option('shallowred.navigation-menus.css.dropdown-class', 'dropdown');
 $ariaExpanded = option('shallowred.navigation-menus.accessibility.aria-expanded', true);
 ?>

@@ -108,7 +108,7 @@ return [
 ]
 ```
 
-### Portfolio Website  
+### Portfolio Website
 ```php
 'shallowred.navigation-menus' => [
     'defaults' => [
@@ -143,7 +143,7 @@ return [
 ## Benefits
 
 - **🎯 Less Configuration**: Set defaults once, use everywhere
-- **🎨 Consistent Styling**: Site-wide CSS class management  
+- **🎨 Consistent Styling**: Site-wide CSS class management
 - **📱 Mobile Ready**: Configurable mobile behavior
 - **♿ Accessible**: Built-in accessibility features
 - **🔒 Secure**: Configurable security measures
