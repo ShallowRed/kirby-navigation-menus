@@ -1,5 +1,9 @@
 label: shallowred.navigation-menus.field.nav-items.label
 type: structure
+columns:
+  text: true
+  type: true
+  link: true
 fields:
   text:
     label: shallowred.navigation-menus.nav-item.text.label
@@ -9,9 +13,12 @@ fields:
     label: shallowred.navigation-menus.nav-item.type.label
     type: select
     options:
-      link: shallowred.navigation-menus.nav-item.type.link
-      button: shallowred.navigation-menus.nav-item.type.button
-      dropdown: shallowred.navigation-menus.nav-item.type.dropdown
+      link:
+        "*": shallowred.navigation-menus.nav-item.type.link
+      button:
+        "*": shallowred.navigation-menus.nav-item.type.button
+      dropdown:
+        "*": shallowred.navigation-menus.nav-item.type.dropdown
   link:
     label: shallowred.navigation-menus.nav-item.link.label
     type: link
@@ -30,11 +37,16 @@ fields:
     label: shallowred.navigation-menus.nav-item.variant.label
     type: select
     options:
-      default: shallowred.navigation-menus.nav-item.variant.default
-      primary: shallowred.navigation-menus.nav-item.variant.primary
-      secondary: shallowred.navigation-menus.nav-item.variant.secondary
-      contrast: shallowred.navigation-menus.nav-item.variant.contrast
-      outline: shallowred.navigation-menus.nav-item.variant.outline
+      default:
+        "*": shallowred.navigation-menus.nav-item.variant.default
+      primary:
+        "*": shallowred.navigation-menus.nav-item.variant.primary
+      secondary:
+        "*": shallowred.navigation-menus.nav-item.variant.secondary
+      contrast:
+        "*": shallowred.navigation-menus.nav-item.variant.contrast
+      outline:
+        "*": shallowred.navigation-menus.nav-item.variant.outline
     default: default
     width: 1/2
   items:

@@ -41,5 +41,7 @@ fields:
     when:
       breadcrumb: false
     options:
-      horizontal: shallowred.navigation-menus.field.layout.horizontal
-      vertical: shallowred.navigation-menus.field.layout.vertical
+      horizontal:
+        "*": shallowred.navigation-menus.field.layout.horizontal
+      vertical:
+        "*": shallowred.navigation-menus.field.layout.vertical
