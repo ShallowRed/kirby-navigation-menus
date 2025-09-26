@@ -31,21 +31,39 @@ return function ($item) {
   }
 
   $classes = ['button'];
+  
+  // Use configured default variant if none specified
   $variant = $item->content()->variant()->value();
+  if (empty($variant)) {
+    $variant = option('shallowred.navigation-menus.defaults.button-variant', 'default');
+  }
   if (!empty($variant)) {
     $classes[] = $variant;
   }
+  
   $style = $item->content()->style()->value();
   if (!empty($style)) {
     $classes[] = $style;
   }
   $cssClasses = implode(' ', array_filter($classes));
 
+  // Handle external links security
+  $rel = null;
+  if ($target) {
+    $rel = 'noopener noreferrer';
+  } else if (option('shallowred.navigation-menus.security.secure-external-links', true)) {
+    // Check if it's an external link
+    $parsed = parse_url($link);
+    if (isset($parsed['host']) && $parsed['host'] !== parse_url(site()->url())['host']) {
+      $rel = 'noopener noreferrer';
+    }
+  }
+
   $buttonAttrs = [
     'href' => $link,
     'class' => $cssClasses,
     'target' => $target ? '_blank' : null,
-    'rel' => $target ? 'noopener noreferrer' : null,
+    'rel' => $rel,
     'role' => 'button',
     'aria-label' => $text,
   ];  return compact([

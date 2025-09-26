@@ -7,6 +7,43 @@ require_once __DIR__ . '/models/navigation-menu-picker.php';
 
 Kirby::plugin('shallowred/navigation-menus', [
 
+  'options' => [
+    // Default behavior configuration
+    'shallowred.navigation-menus.defaults.aria-label' => null,
+    'shallowred.navigation-menus.defaults.layout' => 'horizontal',
+    'shallowred.navigation-menus.defaults.has-toggler' => false,
+    'shallowred.navigation-menus.defaults.wrapper' => 'nav',
+    'shallowred.navigation-menus.defaults.auto-current-detection' => true,
+    'shallowred.navigation-menus.defaults.button-variant' => 'default',
+    
+    // CSS & styling configuration
+    'shallowred.navigation-menus.css.current-page-class' => 'current',
+    'shallowred.navigation-menus.css.nav-toggler-class' => 'nav-toggler',
+    'shallowred.navigation-menus.css.dropdown-class' => 'dropdown',
+    'shallowred.navigation-menus.css.mobile-nav-class' => 'mobile-nav',
+    'shallowred.navigation-menus.css.show-current-icon' => true,
+    'shallowred.navigation-menus.css.current-icon-html' => '<span class="current-page-icon" aria-hidden="true"></span>',
+    
+    // Security & validation
+    'shallowred.navigation-menus.security.allow-external-links' => true,
+    'shallowred.navigation-menus.security.allowed-schemes' => ['https', 'http', 'mailto', 'tel'],
+    'shallowred.navigation-menus.security.max-dropdown-depth' => 2,
+    'shallowred.navigation-menus.security.secure-external-links' => true,
+    
+    // Mobile & accessibility
+    'shallowred.navigation-menus.mobile.breakpoint' => '768px',
+    'shallowred.navigation-menus.mobile.close-on-outside-click' => true,
+    'shallowred.navigation-menus.accessibility.enable-skip-link' => true,
+    'shallowred.navigation-menus.accessibility.skip-link-text' => 'Skip to main content',
+    'shallowred.navigation-menus.accessibility.focus-management' => true,
+    'shallowred.navigation-menus.accessibility.aria-expanded' => true,
+    
+    // Developer experience
+    'shallowred.navigation-menus.debug.dev-warnings' => false,
+    'shallowred.navigation-menus.debug.log-errors' => true,
+    'shallowred.navigation-menus.debug.html-comments' => false,
+  ],
+
   'translations' => [
     'en' => require_once __DIR__ . '/translations/en.php',
     'fr' => require_once __DIR__ . '/translations/fr.php',
@@ -116,9 +153,13 @@ Kirby::plugin('shallowred/navigation-menus', [
       }
 
       try {
-        $icon = !$currentPage->isCurrentPage($navPage)
+        // Use configurable current page icon
+        $showCurrentIcon = option('shallowred.navigation-menus.css.show-current-icon', true);
+        $currentIconHtml = option('shallowred.navigation-menus.css.current-icon-html', '<span class="current-page-icon" aria-hidden="true"></span>');
+        
+        $icon = !$currentPage->isCurrentPage($navPage) || !$showCurrentIcon
           ? ''
-          : Html::tag('span', '', ['class' => 'current-page-icon']);
+          : $currentIconHtml;
 
         $link = $navPage->content()->link();
         if (!$link) {
@@ -184,13 +225,20 @@ Kirby::plugin('shallowred/navigation-menus', [
         return true;
       }
 
+      // Check if external links are allowed
+      $allowExternal = option('shallowred.navigation-menus.security.allow-external-links', true);
+      if (!$allowExternal) {
+        return false; // Block all external URLs if disabled
+      }
+
       // Validate external URLs and block dangerous protocols
       $parsed = parse_url($url);
       if (!$parsed || !isset($parsed['scheme'])) {
         return false;
       }
 
-      $allowedSchemes = ['http', 'https', 'mailto', 'tel'];
+      // Use configurable allowed schemes
+      $allowedSchemes = option('shallowred.navigation-menus.security.allowed-schemes', ['http', 'https', 'mailto', 'tel']);
       return in_array(strtolower($parsed['scheme']), $allowedSchemes);
     }
   ],
