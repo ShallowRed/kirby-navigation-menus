@@ -21,7 +21,7 @@ return function ($item) {
       'item' => $item,
       'link' => $link,
       'linkAttrs' => [],
-      'text' => 'Invalid link'
+      'text' => t('shallowred.navigation-menus.error.invalid-link')
     ];
   }
 

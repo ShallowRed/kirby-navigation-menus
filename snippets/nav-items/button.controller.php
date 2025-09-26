@@ -8,7 +8,7 @@ return function ($item) {
       'item' => $item,
       'link' => '',
       'buttonAttrs' => [],
-      'text' => 'Invalid button'
+      'text' => t('shallowred.navigation-menus.error.invalid-button')
     ];
   }
 
@@ -20,11 +20,9 @@ return function ($item) {
       'item' => $item,
       'link' => $link,
       'buttonAttrs' => [],
-      'text' => 'Invalid link'
+      'text' => t('shallowred.navigation-menus.error.invalid-link')
     ];
-  }
-
-  $target = $item->content()->target()->toBool();
+  }  $target = $item->content()->target()->toBool();
 
   // Sanitize text content
   $text = strip_tags($item->content()->text()->value());

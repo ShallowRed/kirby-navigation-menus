@@ -3,10 +3,10 @@
 return function () {
 
   $options = [];
-  
+
   try {
     $declaredMenus = collection('declared-navigation-menus');
-    
+
     if ($declaredMenus && is_array($declaredMenus)) {
       foreach ($declaredMenus as $key => $menu) {
         // Validate menu structure and sanitize data
@@ -23,23 +23,23 @@ return function () {
       error_log("Navigation menu picker blueprint error: " . $e->getMessage());
     }
   }
-  
+
   // Provide fallback if no menus available
   if (empty($options)) {
     $options[''] = [
-      'text' => 'No menus available',
+      'text' => 'shallowred.navigation-menus.error.no-menus-available',
       'value' => '',
     ];
   }
 
   return [
-    'name' => 'Réutiliser un menu de navigation global',
+    'name' => 'shallowred.navigation-menus.block.picker.name',
     'icon' => 'menu',
     'preview' => 'fields',
     'wysiwyg' => true,
     'fields' => [
       'menu' => [
-        'label' => 'Menu',
+        'label' => 'shallowred.navigation-menus.field.menu.label',
         'type' => 'radio',
         'options' => $options,
         'required' => true,

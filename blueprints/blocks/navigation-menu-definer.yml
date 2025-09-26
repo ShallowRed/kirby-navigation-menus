@@ -1,10 +1,10 @@
-name: Definir un menu de navigation
+name: shallowred.navigation-menus.block.definer.name
 icon: menu
 preview: fields
 wysiwyg: true
 fields:
   brand:
-    label: Bloc identité
+    label: shallowred.navigation-menus.field.brand.label
     type: blocks
     fieldsets:
       - text
@@ -15,31 +15,31 @@ fields:
   ariaLabel:
     required: true
     width: 1/2
-    label: Libellé accessible
-    help: Décrivez le rôle du menu pour les utilisateurs non-voyants
+    label: shallowred.navigation-menus.field.aria-label.label
+    help: shallowred.navigation-menus.field.aria-label.help
     type: text
-    default: Menu de navigation
+    default: shallowred.navigation-menus.field.aria-label.default
   hasNavToggler:
     width: 1/2
-    label: Utiliser un bouton de navigation en mode mobile
+    label: shallowred.navigation-menus.field.nav-toggler.label
     type: toggle
   id:
     width: 1/2
-    label: Identifiant
+    label: shallowred.navigation-menus.field.id.label
     type: slug
-    help: L'identifiant doit être unique
+    help: shallowred.navigation-menus.field.id.help
   breadcrumb:
     width: 1/2
-    label: Fil d'Ariane
+    label: shallowred.navigation-menus.field.breadcrumb.label
     type: toggle
     default: false
   layout:
     width: 1/2
-    label: Disposition
+    label: shallowred.navigation-menus.field.layout.label
     type: select
     default: horizontal
     when:
       breadcrumb: false
     options:
-      horizontal: Horizontale
-      vertical: Verticale
+      horizontal: shallowred.navigation-menus.field.layout.horizontal
+      vertical: shallowred.navigation-menus.field.layout.vertical

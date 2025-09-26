@@ -7,6 +7,11 @@ require_once __DIR__ . '/models/navigation-menu-picker.php';
 
 Kirby::plugin('shallowred/navigation-menus', [
 
+  'translations' => [
+    'en' => require_once __DIR__ . '/translations/en.php',
+    'fr' => require_once __DIR__ . '/translations/fr.php',
+  ],
+
   'collections' => [
     'declared-navigation-menus' => function () {
       return option('shallowred.navigation-menus.declared-navigation-menus');

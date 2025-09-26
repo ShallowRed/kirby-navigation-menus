@@ -24,17 +24,19 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
     $attrs = [];
 
     try {
-      // Sanitize aria label
-      $ariaLabel = strip_tags($this->content()->ariaLabel()->or('Menu de navigation'));
+      // Use translation for default aria label
+      $defaultAriaLabel = t('shallowred.navigation-menus.field.aria-label.default');
+      $ariaLabel = strip_tags($this->content()->ariaLabel()->or($defaultAriaLabel));
+
       if ($this->isBreadcrumb()) {
-        $ariaLabel = 'Fil d\'Ariane';
+        $ariaLabel = t('shallowred.navigation-menus.breadcrumb.aria-label');
       }
       $attrs['aria-label'] = htmlspecialchars($ariaLabel, ENT_QUOTES, 'UTF-8');
     } catch (Exception $e) {
       if (option('debug', false)) {
         error_log("navAttrs error: " . $e->getMessage());
       }
-      $attrs['aria-label'] = 'Navigation menu';
+      $attrs['aria-label'] = t('shallowred.navigation-menus.navigation.aria-label');
     }
 
     return $attrs;
@@ -61,7 +63,7 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
     $attrs['role'] = 'button';
     $attrs['id'] = 'nav-toggler';
     $attrs['class'] = 'nav-toggler button outline';
-    $attrs['aria-label'] = 'Ouvrir le menu de navigation';
+    $attrs['aria-label'] = t('shallowred.navigation-menus.nav-toggler.aria-label');
     $attrs['aria-haspopup'] = 'true';
     $attrs['aria-controls'] = 'main-nav';
     $attrs['tabindex'] = '0';
@@ -70,10 +72,10 @@ class NavMenuDefinerBlock extends \Kirby\Cms\Block
   }
   public function menuIconClosed()
   {
-    return 'Menu';
+    return t('shallowred.navigation-menus.menu-icon.closed');
   }
   public function menuIconOpen()
   {
-    return 'Fermer';
+    return t('shallowred.navigation-menus.menu-icon.open');
   }
 }
