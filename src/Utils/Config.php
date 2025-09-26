@@ -122,7 +122,23 @@ final class Config
      */
     public static function getDeclaredMenus(): array
     {
-        return self::get('declared-navigation-menus', []);
+        $configuredMenus = self::get('declared-navigation-menus', []);
+        
+        // If no menus are configured, provide sensible defaults
+        if (empty($configuredMenus)) {
+            return [
+                'primary' => [
+                    'name' => 'primaryNavigation',
+                    'label' => t('shallowred.navigation-menus.menu.primary.label', 'Primary Navigation'),
+                ],
+                'footer' => [
+                    'name' => 'footerNavigation', 
+                    'label' => t('shallowred.navigation-menus.menu.footer.label', 'Footer Navigation'),
+                ],
+            ];
+        }
+        
+        return $configuredMenus;
     }
 
     /**

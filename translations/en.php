@@ -46,6 +46,10 @@ return [
     'shallowred.navigation-menus.nav-item.variant.outline' => 'Outline',
     'shallowred.navigation-menus.nav-item.items.label' => 'Items',
 
+    // Default menu labels
+    'shallowred.navigation-menus.menu.primary.label' => 'Primary Navigation',
+    'shallowred.navigation-menus.menu.footer.label' => 'Footer Navigation',
+
     // Configuration help text
     'shallowred.navigation-menus.config.help' => 'Configure this plugin in your site/config/config.php file using the shallowred.navigation-menus options.',
 ];

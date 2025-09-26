@@ -13,12 +13,10 @@ fields:
   items:
     extends: fields/nav-items
   ariaLabel:
-    required: true
     width: 1/2
     label: shallowred.navigation-menus.field.aria-label.label
     help: shallowred.navigation-menus.field.aria-label.help
     type: text
-    default: shallowred.navigation-menus.field.aria-label.default
   hasNavToggler:
     width: 1/2
     label: shallowred.navigation-menus.field.nav-toggler.label

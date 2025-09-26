@@ -46,6 +46,10 @@ return [
     'shallowred.navigation-menus.nav-item.variant.outline' => 'Contour',
     'shallowred.navigation-menus.nav-item.items.label' => 'Éléments',
 
+    // Default menu labels
+    'shallowred.navigation-menus.menu.primary.label' => 'Navigation principale',
+    'shallowred.navigation-menus.menu.footer.label' => 'Navigation pied de page',
+
     // Configuration help text
     'shallowred.navigation-menus.config.help' => 'Configurez ce plugin dans votre fichier site/config/config.php en utilisant les options shallowred.navigation-menus.',
 ];
