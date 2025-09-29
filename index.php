@@ -125,6 +125,14 @@ Kirby::plugin('shallowred/navigation-menus', [
         'navigation-menu-picker' => NavigationMenuPickerBlock::class,
     ],
 
+    'pageModels' => [
+        'static-menu' => \ShallowRed\NavigationMenus\Models\StaticMenuPage::class,
+    ],
+
+    'snippets' => [
+        'static-menu' => __DIR__ . '/snippets/static-menu.php',
+    ],
+
     'siteMethods' => [
         /**
          * Get navigation menu by key
@@ -227,6 +235,42 @@ Kirby::plugin('shallowred/navigation-menus', [
         'navigationUrl' => function (string $url): bool {
             return UrlValidator::isValid($url);
         },
+    ],
+
+    'routes' => [
+        [
+            'pattern' => 'static-menu',
+            'method' => 'GET',
+            'action' => function () {
+                // Validate required parameters
+                $menuKey = get('menu');
+                $backUrl = get('back');
+
+                if (empty($menuKey)) {
+                    return site()->errorPage();
+                }
+
+                // Validate menu exists in declared menus
+                $declaredMenus = Config::getDeclaredMenus();
+                if (!array_key_exists($menuKey, $declaredMenus)) {
+                    return site()->errorPage();
+                }
+
+                // Validate back URL for security
+                if (!empty($backUrl) && !UrlValidator::isValid($backUrl)) {
+                    return site()->errorPage();
+                }
+
+                // Create virtual page for static menu
+                return new \ShallowRed\NavigationMenus\Models\StaticMenuPage([
+                    'slug' => 'static-menu',
+                    'template' => 'static-menu',
+                    'content' => [
+                        'title' => 'Navigation Menu',
+                    ],
+                ]);
+            },
+        ],
     ],
 
     'api' => [

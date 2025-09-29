@@ -238,6 +238,10 @@ class NavigationMenuDefinerBlock extends Block
             $attrs['aria-label'] = t('shallowred.navigation-menus.mobile.toggle-label');
         }
 
+        // Data attributes for JavaScript enhancement and static menu fallback
+        $attrs['data-nav-target'] = '#' . $this->getUniqueNavId();
+        $attrs['data-static-menu-url'] = $this->getStaticMenuUrl();
+
         return $attrs;
     }
 
@@ -341,6 +345,30 @@ class NavigationMenuDefinerBlock extends Block
             'show_home' => Config::getDefault('show-home-link') ?? true,
             'separator' => $this->content()->breadcrumbSeparator()->or('›')->toString(),
             'show_current' => $this->content()->showCurrentInBreadcrumb()->toBool(true),
+        ];
+    }
+
+    /**
+     * Generate static menu URL for no-JS mobile navigation
+     */
+    public function getStaticMenuUrl(): string
+    {
+        $menuKey = $this->getMenuKey();
+        $currentPage = page();
+        $backUrl = $currentPage ? $currentPage->url() : site()->url();
+
+        return site()->url() . '/static-menu?menu=' . urlencode($menuKey) . '&back=' . urlencode($backUrl);
+    }
+
+    /**
+     * Get noscript fallback link attributes
+     */
+    public function noscriptLinkAttrs(): array
+    {
+        return [
+            'href' => $this->getStaticMenuUrl(),
+            'class' => 'nav-fallback-link',
+            'aria-label' => 'Open navigation menu (fallback)',
         ];
     }
 }
