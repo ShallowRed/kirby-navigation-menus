@@ -10,6 +10,28 @@ fields:
       - text
       - image
       - site-logo
+  brandLinkEnabled:
+    label: shallowred.navigation-menus.field.brand-link-enabled.label
+    help: shallowred.navigation-menus.field.brand-link-enabled.help
+    type: toggle
+    width: 1/2
+  brandLink:
+    when:
+      brandLinkEnabled: true
+    label: shallowred.navigation-menus.field.brand-link.label
+    help: shallowred.navigation-menus.field.brand-link.help
+    type: link
+    width: 1/2
+    options:
+      - page
+      - url
+      - anchor
+  brandTarget:
+    when:
+      brandLinkEnabled: true
+    label: shallowred.navigation-menus.field.brand-target.label
+    type: toggle
+    width: 1/2
   items:
     extends: fields/nav-items
   ariaLabel:

@@ -16,6 +16,11 @@ return [
 
     // Field labels
     'shallowred.navigation-menus.field.brand.label' => 'Bloc identité',
+    'shallowred.navigation-menus.field.brand-link-enabled.label' => 'Rendre le bloc identité cliquable',
+    'shallowred.navigation-menus.field.brand-link-enabled.help' => 'Activer pour envelopper le bloc identité dans un lien',
+    'shallowred.navigation-menus.field.brand-link.label' => 'Lien du bloc identité',
+    'shallowred.navigation-menus.field.brand-link.help' => 'Lien pour le bloc identité (par défaut page d\'accueil)',
+    'shallowred.navigation-menus.field.brand-target.label' => 'Ouvrir le lien dans une nouvelle fenêtre',
     'shallowred.navigation-menus.field.nav-items.label' => 'Éléments de navigation',
     'shallowred.navigation-menus.field.aria-label.label' => 'Libellé accessible',
     'shallowred.navigation-menus.field.aria-label.help' => 'Décrivez le rôle du menu pour les utilisateurs non-voyants',

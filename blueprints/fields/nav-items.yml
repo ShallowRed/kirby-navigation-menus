@@ -12,6 +12,7 @@ fields:
   type:
     label: shallowred.navigation-menus.nav-item.type.label
     type: select
+    default: link
     options:
       link:
         "*": shallowred.navigation-menus.nav-item.type.link
@@ -22,6 +23,7 @@ fields:
   link:
     label: shallowred.navigation-menus.nav-item.link.label
     type: link
+    required: true
     width: 1/2
     options:
       - page

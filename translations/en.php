@@ -16,6 +16,11 @@ return [
 
     // Field labels
     'shallowred.navigation-menus.field.brand.label' => 'Brand block',
+    'shallowred.navigation-menus.field.brand-link-enabled.label' => 'Make brand block linkable',
+    'shallowred.navigation-menus.field.brand-link-enabled.help' => 'Enable this to wrap the brand in a link',
+    'shallowred.navigation-menus.field.brand-link.label' => 'Brand link',
+    'shallowred.navigation-menus.field.brand-link.help' => 'Link for the brand block (defaults to homepage)',
+    'shallowred.navigation-menus.field.brand-target.label' => 'Open brand link in new window',
     'shallowred.navigation-menus.field.nav-items.label' => 'Navigation items',
     'shallowred.navigation-menus.field.aria-label.label' => 'Accessible label',
     'shallowred.navigation-menus.field.aria-label.help' => 'Describe the menu\'s role for screen reader users',

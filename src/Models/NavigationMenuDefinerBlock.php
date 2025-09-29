@@ -32,7 +32,7 @@ class NavigationMenuDefinerBlock extends Block
         if ($this->isBreadcrumb()) {
             return 'horizontal';
         }
-        
+
         $defaultLayout = Config::getDefault('layout') ?? 'horizontal';
         return $this->content()->layout()->or($defaultLayout)->toString();
     }    /**
@@ -48,6 +48,76 @@ class NavigationMenuDefinerBlock extends Block
         }
 
         return $defaultWrapper;
+    }
+
+    /**
+     * Check if brand link is enabled
+     */
+    public function isBrandLinkEnabled(): bool
+    {
+        return $this->content()->brandLinkEnabled()->toBool();
+    }
+
+    /**
+     * Check if brand should be wrapped in a link
+     */
+    public function shouldBrandBeLinked(): bool
+    {
+        if (!$this->isBrandLinkEnabled()) {
+            return false;
+        }
+
+        // Get the target URL
+        $targetUrl = $this->getBrandLink();
+        $currentUrl = page() ? page()->url() : site()->url();
+
+        // Don't link if we're on the same page
+        return $targetUrl !== $currentUrl;
+    }
+
+    /**
+     * Get brand link URL with fallback to homepage
+     */
+    public function getBrandLink(): string
+    {
+        $brandLink = $this->content()->brandLink();
+
+        if ($brandLink->isEmpty()) {
+            // Default to homepage
+            return site()->url();
+        }
+
+        return $brandLink->toUrl();
+    }
+
+    /**
+     * Check if brand link should open in new window
+     */
+    public function isBrandTargetBlank(): bool
+    {
+        return $this->content()->brandTarget()->toBool();
+    }
+
+    /**
+     * Get brand link attributes
+     */
+    public function getBrandLinkAttrs(): array
+    {
+        if (!$this->shouldBrandBeLinked()) {
+            return [];
+        }
+
+        $attrs = [
+            'href' => $this->getBrandLink(),
+            'class' => 'brand-link'
+        ];
+
+        if ($this->isBrandTargetBlank()) {
+            $attrs['target'] = '_blank';
+            $attrs['rel'] = 'noopener noreferrer';
+        }
+
+        return $attrs;
     }
 
     /**
@@ -77,13 +147,57 @@ class NavigationMenuDefinerBlock extends Block
             $attrs['aria-label'] = 'Navigation';
         }
 
-        // Add ID for mobile navigation
-        if ($this->hasNavToggler()) {
-            $navId = $this->content()->navId()->or('main-nav')->toString();
-            $attrs['id'] = htmlspecialchars($navId, ENT_QUOTES, 'UTF-8');
-        }
+        // Always add ID for navigation - required for accessibility and mobile navigation
+        $navId = $this->getUniqueNavId();
+        $attrs['id'] = htmlspecialchars($navId, ENT_QUOTES, 'UTF-8');
 
         return $attrs;
+    }
+
+    /**
+     * Get unique navigation ID for this menu
+     */
+    public function getUniqueNavId(): string
+    {
+        // If user provided a custom ID, use it
+        $customId = $this->content()->navId()->toString();
+        if (!empty($customId)) {
+            return $customId;
+        }
+
+        // Try to determine menu key from context
+        $menuKey = $this->getMenuKeyFromContext();
+        if ($menuKey) {
+            return $menuKey . '-nav';
+        }
+
+        // Fallback to block UUID
+        return 'nav-' . $this->id();
+    }
+
+    /**
+     * Get the menu key this block belongs to by checking declared menus
+     */
+    private function getMenuKeyFromContext(): ?string
+    {
+        $declaredMenus = Config::getDeclaredMenus();
+        $currentBlockId = $this->id();
+
+        foreach ($declaredMenus as $key => $config) {
+            $fieldName = $config['name'] ?? $key;
+            $fieldContent = site()->content()->get($fieldName);
+
+            if ($fieldContent && !$fieldContent->isEmpty()) {
+                $blocks = $fieldContent->toBlocks();
+                foreach ($blocks as $block) {
+                    if ($block->id() === $currentBlockId) {
+                        return $key;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -92,7 +206,7 @@ class NavigationMenuDefinerBlock extends Block
     public function hasNavToggler(): bool
     {
         $defaultHasToggler = Config::getDefault('has-toggler') ?? true;
-        return $this->content()->hasToggler()->toBool($defaultHasToggler);
+        return $this->content()->hasNavToggler()->toBool($defaultHasToggler);
     }
 
     /**
@@ -116,7 +230,7 @@ class NavigationMenuDefinerBlock extends Block
 
         // Accessibility
         if (Config::getAccessibility()['aria-expanded']) {
-            $attrs['aria-controls'] = $this->content()->navId()->or('main-nav')->toString();
+            $attrs['aria-controls'] = $this->getUniqueNavId();
         }
 
         // Screen reader text
