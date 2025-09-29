@@ -118,6 +118,7 @@ Kirby::plugin('shallowred/navigation-menus', [
         'nav-items/link.controller' => __DIR__ . '/src/Controllers/LinkController.php',
         'nav-items/button' => __DIR__ . '/snippets/nav-items/button.php',
         'nav-items/button.controller' => __DIR__ . '/src/Controllers/ButtonController.php',
+        'static-menu' => __DIR__ . '/snippets/static-menu.php',
     ],
 
     'blockModels' => [
@@ -127,10 +128,6 @@ Kirby::plugin('shallowred/navigation-menus', [
 
     'pageModels' => [
         'static-menu' => \ShallowRed\NavigationMenus\Models\StaticMenuPage::class,
-    ],
-
-    'snippets' => [
-        'static-menu' => __DIR__ . '/snippets/static-menu.php',
     ],
 
     'siteMethods' => [

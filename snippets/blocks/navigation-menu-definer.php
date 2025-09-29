@@ -29,26 +29,15 @@
     <?php if ($block->hasNavToggler()): ?>
         <ul class="nav-togglers">
             <li>
-                <button <?= attr($block->navTogglerAttrs()) ?>>
+                <a href="<?= $block->getStaticMenuUrl() ?>" <?= attr($block->navTogglerAttrs()) ?>>
                     <span class="nav-toggler__closed">
                         <?= $block->menuIconClosed() ?>
                     </span>
                     <span class="nav-toggler__open">
                         <?= $block->menuIconOpen() ?>
                     </span>
-                </button>
+                </a>
             </li>
         </ul>
-
-        <!-- No-JS fallback for mobile navigation -->
-        <noscript>
-            <ul class="nav-fallback">
-                <li>
-                    <a <?= attr($block->noscriptLinkAttrs()) ?>>
-                        <?= $block->menuIconClosed() ?> Menu
-                    </a>
-                </li>
-            </ul>
-        </noscript>
     <?php endif ?>
 </<?= $block->wrapper() ?>>

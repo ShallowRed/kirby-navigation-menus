@@ -220,27 +220,26 @@ class NavigationMenuDefinerBlock extends Block
 
         $attrs = [];
 
-        // Basic button attributes
-        $attrs['type'] = 'button';
-        $attrs['aria-expanded'] = 'false';
-
         // CSS class from configuration
         $togglerClass = Config::getCssValue('nav-toggler-class') ?: 'nav-toggler';
         $attrs['class'] = $togglerClass;
 
-        // Accessibility
+        // Accessibility for enhanced behavior
+        $attrs['role'] = 'button';
+        $attrs['aria-expanded'] = 'false';
+
         if (Config::getAccessibility()['aria-expanded']) {
             $attrs['aria-controls'] = $this->getUniqueNavId();
         }
 
         // Screen reader text
         if (Config::getAccessibility()['screen-reader-text']) {
-            $attrs['aria-label'] = t('shallowred.navigation-menus.mobile.toggle-label');
+            $attrs['aria-label'] = t('shallowred.navigation-menus.mobile.toggle-label', 'Toggle navigation menu');
         }
 
-        // Data attributes for JavaScript enhancement and static menu fallback
+        // Data attributes for JavaScript enhancement
         $attrs['data-nav-target'] = '#' . $this->getUniqueNavId();
-        $attrs['data-static-menu-url'] = $this->getStaticMenuUrl();
+        $attrs['data-toggle'] = 'navigation';
 
         return $attrs;
     }
@@ -349,6 +348,15 @@ class NavigationMenuDefinerBlock extends Block
     }
 
     /**
+     * Get the menu key for this block
+     */
+    public function getMenuKey(): string
+    {
+        $menuKey = $this->getMenuKeyFromContext();
+        return $menuKey ?: 'default';
+    }
+
+    /**
      * Generate static menu URL for no-JS mobile navigation
      */
     public function getStaticMenuUrl(): string
@@ -360,15 +368,5 @@ class NavigationMenuDefinerBlock extends Block
         return site()->url() . '/static-menu?menu=' . urlencode($menuKey) . '&back=' . urlencode($backUrl);
     }
 
-    /**
-     * Get noscript fallback link attributes
-     */
-    public function noscriptLinkAttrs(): array
-    {
-        return [
-            'href' => $this->getStaticMenuUrl(),
-            'class' => 'nav-fallback-link',
-            'aria-label' => 'Open navigation menu (fallback)',
-        ];
-    }
+
 }
