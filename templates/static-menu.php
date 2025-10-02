@@ -16,11 +16,10 @@ use ShallowRed\NavigationMenus\Models\StaticMenuPage;
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= esc($page->getMenuTitle()) ?> | <?= esc(site()->title()) ?></title>
-      <?php echo vite()->css("vite.entry.js"); ?>
 </head>
 
-<body class="static-menu-page no-js">
-    <?= snippet('static-menu', ['page' => $page]) ?>
-    <?php echo vite()->js("vite.entry.js");?>
+<body class="static-menu-page">
+    <?php snippet('static-menu', ['page' => $page]) ?>
+    You should override this template in your site to match your sites' html templating, including loading your CSS and JS assets as needed.
 </body>
 </html>

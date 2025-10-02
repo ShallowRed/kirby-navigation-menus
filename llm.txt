@@ -1,0 +1,248 @@
+# Kirby Navigation Menus Plugin
+
+## Overview
+
+A powerful and flexible navigation menu system for Kirby CMS with advanced features like dropdowns, mobile toggles, breadcrumbs, and comprehensive accessibility support. This plugin provides reusable navigation components that can be defined once and used throughout the site.
+
+## Philosophy
+
+- **Reusable Navigation**: Define navigation menus once, use them anywhere via blocks
+- **Accessibility First**: Built-in ARIA attributes, keyboard navigation, screen reader support
+- **Mobile-First Design**: Progressive enhancement with no-JS fallbacks and mobile toggles
+- **Security Built-in**: XSS protection, URL validation, external link handling
+- **Multilingual Ready**: Full internationalization with English and French translations
+- **Clean Architecture**: Logic in models, presentation in snippets, clear separation of concerns
+
+## Plugin Features
+
+### Available Blocks
+
+1. **Navigation Menu Definer Block** (`navigation-menu-definer`)
+   - Defines complete navigation menus with brand, items, and mobile toggles
+   - Supports breadcrumb mode with automatic layout adjustment
+   - Configurable brand linking with same-page detection
+   - Mobile navigation with static menu fallbacks
+   - Multiple layout options: horizontal, vertical
+   - Accessibility features: ARIA labels, skip links, screen reader text
+
+2. **Navigation Menu Picker Block** (`navigation-menu-picker`)
+   - Reuses globally defined navigation menus
+   - Simple block that renders pre-configured menus
+   - Maintains consistency across site sections
+   - Automatic menu validation and error handling
+
+### Navigation Item Types
+
+- **Link Items**: Internal pages, external URLs, and anchor links
+- **Button Items**: Action-oriented navigation elements
+- **Dropdown Items**: Multi-level navigation with accessibility support
+
+## Architecture
+
+### File Structure
+```
+src/Models/          # Block models (ShallowRed\NavigationMenus\Models\)
+├── NavigationMenuDefinerBlock.php    # Main navigation definition logic
+├── NavigationMenuPickerBlock.php     # Reusable menu selection logic
+└── StaticMenuPage.php               # Virtual page for no-JS mobile menus
+
+src/Navigation/      # Navigation helper classes
+└── NavigationHelper.php            # Core navigation generation logic
+
+src/Utils/          # Utility classes
+├── Config.php      # Configuration management with defaults
+└── UrlValidator.php # URL validation and security
+
+src/Controllers/    # Snippet controllers
+├── LinkController.php              # Link item rendering logic
+└── ButtonController.php           # Button item rendering logic
+
+snippets/blocks/    # Block presentation templates
+├── navigation-menu-definer.php    # Main navigation template
+└── navigation-menu-picker.php     # Reusable menu template
+
+snippets/nav-items/ # Navigation item templates
+├── link.php        # Link item template
+├── button.php      # Button item template
+└── dropdown.php    # Dropdown item template
+
+blueprints/        # Panel field definitions
+├── blocks/        # Block blueprints
+├── fields/        # Reusable field definitions
+└── sections/      # Dynamic panel sections
+
+templates/         # Page templates
+└── static-menu.php # No-JS mobile menu template
+
+translations/      # Multilingual support
+├── en.php         # English translations
+└── fr.php         # French translations
+```
+
+### Key Principles
+
+1. **Models handle logic**: All data processing and business logic in block model classes
+2. **Snippets are pure**: Only presentation, use snippet controllers for complex logic
+3. **Namespaced classes**: PSR-4 autoloading with ShallowRed\NavigationMenus namespace
+4. **Progressive enhancement**: No-JS fallbacks with static menu pages for mobile
+5. **Security first**: Input validation, XSS protection, and URL sanitization
+6. **Accessibility compliance**: ARIA attributes, semantic HTML, keyboard navigation
+
+## Development Workflow
+
+### Making Changes
+
+1. **Edit code**: Modify models, snippets, or controllers
+2. **Lint code**: Run `composer lint` to check code style
+3. **Auto-fix**: Run `composer lint:fix` to automatically fix issues
+4. **Test functionality**: Verify in Kirby panel and frontend
+5. **Test mobile**: Check no-JS static menu fallbacks
+6. **Test accessibility**: Verify ARIA attributes and keyboard navigation
+
+### Code Standards
+
+- **PSR-12 compliance**: Modern PHP standards with 2-space indentation
+- **Kirby conventions**: Follow Kirby's coding patterns and standards
+- **Semantic HTML**: Meaningful, accessible markup structure
+- **Security practices**: Input validation, XSS protection, URL sanitization
+- **Progressive enhancement**: JavaScript-optional functionality
+- **Accessibility**: WCAG 2.1 compliance with proper ARIA usage
+
+### Commands
+
+```bash
+# Code quality
+composer lint           # Check code style with PHP_CodeSniffer
+composer lint:fix       # Auto-fix style issues (phpcbf)
+
+# Testing
+composer test           # Run PHPUnit tests (when available)
+
+# Development helpers
+composer install        # Install dependencies
+composer dump-autoload  # Regenerate autoloader
+```
+
+### Linting Configuration
+
+Uses `.phpcs.xml` with:
+- PSR-12 base standards for modern PHP
+- 2-space indentation (Kirby style)
+- Custom rules for arrays and scope indentation
+- Excludes vendor and node_modules directories
+- Parallel processing for faster checking (8 files simultaneously)
+- Progress and sniff codes in output for debugging
+
+## Configuration
+
+### Declared Navigation Menus
+
+Define reusable menus in your site configuration:
+
+```php
+// site/config/config.php
+return [
+    'shallowred.navigation-menus.declared-navigation-menus' => [
+        'main' => [
+            'name' => 'main_navigation',
+            'label' => 'Main Navigation'
+        ],
+        'footer' => [
+            'name' => 'footer_navigation',
+            'label' => 'Footer Navigation'
+        ]
+    ]
+];
+```
+
+### Advanced Configuration Options
+
+```php
+// Additional plugin configuration
+'shallowred.navigation-menus.css.wrapper-class' => 'main-nav',
+'shallowred.navigation-menus.css.current-page-class' => 'current',
+'shallowred.navigation-menus.accessibility.enable-skip-link' => true,
+'shallowred.navigation-menus.security.allow-external-links' => false,
+'shallowred.navigation-menus.defaults.layout' => 'horizontal',
+```
+
+## Integration
+
+### For Users
+1. Install via Composer: `composer require shallowred/kirby-navigation-menus`
+2. Configure declared menus in site configuration
+3. Add navigation blocks to your blueprints
+4. Style the generated semantic HTML with your CSS framework
+
+### For Developers
+1. Models extend `Kirby\Cms\Block` with navigation-specific logic
+2. Snippets use model methods and snippet controllers for complex rendering
+3. Static menu pages provide no-JS mobile navigation fallbacks
+4. Configuration system with sensible defaults and validation
+5. Helper classes for navigation generation and URL validation
+
+## Usage Examples
+
+### Blueprint Integration
+
+```yaml
+# site/blueprints/site.yml
+fields:
+  main_navigation:
+    label: Main Navigation
+    type: blocks
+    fieldsets:
+      - navigation-menu-definer
+    max: 1
+
+  content:
+    type: blocks
+    fieldsets:
+      - navigation-menu-picker  # Reuse defined menus
+      - text
+      - heading
+```
+
+### Template Usage
+
+```php
+<!-- Display main navigation -->
+<?php foreach (site()->main_navigation()->toBlocks() as $block): ?>
+  <?= $block ?>
+<?php endforeach ?>
+
+<!-- Alternative: Use navigation helper -->
+<?php $navPages = site()->navPages('main') ?>
+<?php if ($navPages): ?>
+  <nav aria-label="Main navigation">
+    <ul>
+      <?php foreach ($navPages as $navPage): ?>
+        <li><?= site()->renderNavItem($navPage, $page) ?></li>
+      <?php endforeach ?>
+    </ul>
+  </nav>
+<?php endif ?>
+```
+
+### Mobile Navigation with JavaScript Enhancement
+
+```javascript
+// Progressive enhancement for mobile navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const togglers = document.querySelectorAll('.nav-toggler');
+
+    togglers.forEach(toggler => {
+        toggler.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = toggler.getAttribute('data-nav-target');
+            const nav = document.querySelector(targetId);
+            const isExpanded = toggler.getAttribute('aria-expanded') === 'true';
+
+            toggler.setAttribute('aria-expanded', !isExpanded);
+            nav.classList.toggle('is-open');
+        });
+    });
+});
+```
+
+The plugin generates semantic, accessible HTML that works with any CSS framework while providing comprehensive navigation functionality including mobile support, breadcrumbs, and multilingual capabilities.
