@@ -21,6 +21,11 @@ use ShallowRed\NavigationMenus\Navigation\NavigationHelper;
 use ShallowRed\NavigationMenus\Utils\Config;
 use ShallowRed\NavigationMenus\Utils\UrlValidator;
 
+// Global storage for performance tracking to avoid dynamic property deprecation
+if (!isset($GLOBALS['kirby_navigation_render_times'])) {
+    $GLOBALS['kirby_navigation_render_times'] = [];
+}
+
 // Autoloader for plugin classes
 spl_autoload_register(function (string $class): void {
     if (str_starts_with($class, 'ShallowRed\\NavigationMenus\\')) {
@@ -215,15 +220,20 @@ Kirby::plugin('shallowred/navigation-menus', [
         'page.render:before' => function (\Kirby\Cms\Page $page): void {
             // Performance tracking in debug mode
             if (Config::getDebug()['show-performance']) {
-                $page->navigationRenderStart = microtime(true);
+                // Store render start time in global storage to avoid dynamic property deprecation
+                $GLOBALS['kirby_navigation_render_times'][$page->id()] = microtime(true);
             }
         },
 
         'page.render:after' => function (\Kirby\Cms\Page $page, string $html): void {
             // Log performance metrics in debug mode
-            if (Config::getDebug()['show-performance'] && isset($page->navigationRenderStart)) {
-                $renderTime = microtime(true) - $page->navigationRenderStart;
-                error_log("NavigationMenus: Page render time: {$renderTime}s for {$page->url()}");
+            if (Config::getDebug()['show-performance']) {
+                $pageId = $page->id();
+                if (isset($GLOBALS['kirby_navigation_render_times'][$pageId])) {
+                    $renderTime = microtime(true) - $GLOBALS['kirby_navigation_render_times'][$pageId];
+                    error_log("NavigationMenus: Page render time: {$renderTime}s for {$page->url()}");
+                    unset($GLOBALS['kirby_navigation_render_times'][$pageId]);
+                }
             }
         },
     ],
