@@ -33,7 +33,12 @@ fields:
     type: toggle
     width: 1/2
   items:
-    extends: fields/nav-items
+    label: shallowred.navigation-menus.field.nav-items.label
+    type: blocks
+    fieldsets:
+      - nav-link
+      - nav-button
+      - nav-dropdown
   ariaLabel:
     width: 1/2
     label: shallowred.navigation-menus.field.aria-label.label

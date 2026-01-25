@@ -1,0 +1,18 @@
+name: shallowred.navigation-menus.block.nav-dropdown.name
+icon: angle-down
+preview: fields
+wysiwyg: true
+
+label: "{{ text }}"
+
+fields:
+  text:
+    label: shallowred.navigation-menus.nav-item.text.label
+    type: text
+    required: true
+  items:
+    label: shallowred.navigation-menus.nav-item.items.label
+    type: blocks
+    fieldsets:
+      - link
+      - button

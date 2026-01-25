@@ -17,6 +17,7 @@ use Kirby\Cms\App;
 use Kirby\Uuid\Uuid;
 use ShallowRed\NavigationMenus\Models\NavigationMenuDefinerBlock;
 use ShallowRed\NavigationMenus\Models\NavigationMenuPickerBlock;
+use ShallowRed\NavigationMenus\Models;
 use ShallowRed\NavigationMenus\Navigation\NavigationHelper;
 use ShallowRed\NavigationMenus\Utils\Config;
 use ShallowRed\NavigationMenus\Utils\UrlValidator;
@@ -107,6 +108,9 @@ Kirby::plugin('shallowred/navigation-menus', [
     'blueprints' => [
         'blocks/navigation-menu-definer' => __DIR__ . '/blueprints/blocks/navigation-menu-definer.yml',
         'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
+        'blocks/nav-link' => __DIR__ . '/blueprints/blocks/nav-link.yml',
+        'blocks/nav-button' => __DIR__ . '/blueprints/blocks/nav-button.yml',
+        'blocks/nav-dropdown' => __DIR__ . '/blueprints/blocks/nav-dropdown.yml',
         'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
         'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
     ],
@@ -118,6 +122,10 @@ Kirby::plugin('shallowred/navigation-menus', [
     'snippets' => [
         'blocks/navigation-menu-picker' => __DIR__ . '/snippets/blocks/navigation-menu-picker.php',
         'blocks/navigation-menu-definer' => __DIR__ . '/snippets/blocks/navigation-menu-definer.php',
+        'blocks/nav-link' => __DIR__ . '/snippets/blocks/nav-link.php',
+        'blocks/nav-button' => __DIR__ . '/snippets/blocks/nav-button.php',
+        'blocks/nav-dropdown' => __DIR__ . '/snippets/blocks/nav-dropdown.php',
+        // Legacy structure-based snippets (deprecated)
         'nav-items/dropdown' => __DIR__ . '/snippets/nav-items/dropdown.php',
         'nav-items/link' => __DIR__ . '/snippets/nav-items/link.php',
         'nav-items/link.controller' => __DIR__ . '/src/Controllers/LinkController.php',
@@ -129,6 +137,9 @@ Kirby::plugin('shallowred/navigation-menus', [
     'blockModels' => [
         'navigation-menu-definer' => NavigationMenuDefinerBlock::class,
         'navigation-menu-picker' => NavigationMenuPickerBlock::class,
+        'nav-link' => Models\NavLinkBlock::class,
+        'nav-button' => Models\NavButtonBlock::class,
+        'nav-dropdown' => Models\NavDropdownBlock::class,
     ],
 
     'pageModels' => [

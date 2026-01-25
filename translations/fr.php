@@ -13,6 +13,9 @@ return [
     // Blueprint labels
     'shallowred.navigation-menus.block.definer.name' => 'Définir un menu de navigation',
     'shallowred.navigation-menus.block.picker.name' => 'Réutiliser un menu de navigation global',
+    'shallowred.navigation-menus.block.nav-link.name' => 'Lien',
+    'shallowred.navigation-menus.block.nav-button.name' => 'Bouton',
+    'shallowred.navigation-menus.block.nav-dropdown.name' => 'Menu déroulant',
 
     // Field labels
     'shallowred.navigation-menus.field.brand.label' => 'Bloc identité',
