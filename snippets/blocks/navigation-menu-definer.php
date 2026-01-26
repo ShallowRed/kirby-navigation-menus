@@ -7,13 +7,7 @@
     <?php if ($block->content()->brand()->isNotEmpty()): ?>
         <ul class="nav-brand">
             <li>
-                <?php if ($block->shouldBrandBeLinked()): ?>
-                    <a <?= attr($block->getBrandLinkAttrs()) ?>>
-                        <?= $block->content()->brand()->toBlocks() ?>
-                    </a>
-                <?php else: ?>
-                    <?= $block->content()->brand()->toBlocks() ?>
-                <?php endif ?>
+                <?= $block->content()->brand()->toBlocks() ?>
             </li>
         </ul>
     <?php endif ?>
