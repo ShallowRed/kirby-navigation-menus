@@ -108,10 +108,7 @@ Kirby::plugin('shallowred/navigation-menus', [
     'blueprints' => [
         'blocks/navigation-menu-definer' => __DIR__ . '/blueprints/blocks/navigation-menu-definer.yml',
         'blocks/navigation-menu-picker' => include __DIR__ . '/blueprints/blocks/navigation-menu-picker.php',
-        'blocks/nav-link' => __DIR__ . '/blueprints/blocks/nav-link.yml',
-        'blocks/nav-button' => __DIR__ . '/blueprints/blocks/nav-button.yml',
         'blocks/nav-dropdown' => __DIR__ . '/blueprints/blocks/nav-dropdown.yml',
-        'fields/nav-items' => __DIR__ . '/blueprints/fields/nav-items.yml',
         'sections/declared-navigation-menus' => include __DIR__ . '/blueprints/sections/declared-navigation-menus.php',
     ],
 
@@ -122,23 +119,13 @@ Kirby::plugin('shallowred/navigation-menus', [
     'snippets' => [
         'blocks/navigation-menu-picker' => __DIR__ . '/snippets/blocks/navigation-menu-picker.php',
         'blocks/navigation-menu-definer' => __DIR__ . '/snippets/blocks/navigation-menu-definer.php',
-        'blocks/nav-link' => __DIR__ . '/snippets/blocks/nav-link.php',
-        'blocks/nav-button' => __DIR__ . '/snippets/blocks/nav-button.php',
         'blocks/nav-dropdown' => __DIR__ . '/snippets/blocks/nav-dropdown.php',
-        // Legacy structure-based snippets (deprecated)
-        'nav-items/dropdown' => __DIR__ . '/snippets/nav-items/dropdown.php',
-        'nav-items/link' => __DIR__ . '/snippets/nav-items/link.php',
-        'nav-items/link.controller' => __DIR__ . '/src/Controllers/LinkController.php',
-        'nav-items/button' => __DIR__ . '/snippets/nav-items/button.php',
-        'nav-items/button.controller' => __DIR__ . '/src/Controllers/ButtonController.php',
         'static-menu' => __DIR__ . '/snippets/static-menu.php',
     ],
 
     'blockModels' => [
         'navigation-menu-definer' => NavigationMenuDefinerBlock::class,
         'navigation-menu-picker' => NavigationMenuPickerBlock::class,
-        'nav-link' => Models\NavLinkBlock::class,
-        'nav-button' => Models\NavButtonBlock::class,
         'nav-dropdown' => Models\NavDropdownBlock::class,
     ],
 
