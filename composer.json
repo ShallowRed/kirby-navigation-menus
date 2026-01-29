@@ -1,7 +1,7 @@
 {
     "name": "shallowred/kirby-navigation-menus",
     "description": "A powerful and flexible navigation menu system for Kirby CMS with advanced features like dropdowns, mobile toggles, breadcrumbs, and comprehensive accessibility support.",
-    "version": "2.0.0-rc.4",
+    "version": "2.0.0-rc.5",
     "license": "MIT",
     "type": "kirby-plugin",
     "keywords": [
