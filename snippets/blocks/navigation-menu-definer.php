@@ -1,8 +1,16 @@
 <?php
 /**
  * Navigation Menu Definer Block Snippet
+ *
+ * Uses checkbox hack for CSS-only mobile menu toggle.
+ * The checkbox is placed before the nav element to enable sibling selectors.
  */
+$toggleId = 'nav-toggle-' . $block->id();
 ?>
+<?php if ($block->hasNavToggler()): ?>
+    <input type="checkbox" id="<?= $toggleId ?>" class="nav-toggle-input" aria-hidden="true">
+<?php endif ?>
+
 <<?= $block->wrapper() ?> <?= attr($block->navAttrs()) ?>>
     <?php if ($block->content()->brand()->isNotEmpty()): ?>
         <ul class="nav-brand">
@@ -21,14 +29,14 @@
     <?php if ($block->hasNavToggler()): ?>
         <ul class="nav-togglers">
             <li>
-                <a href="<?= $block->getStaticMenuUrl() ?>" <?= attr($block->navTogglerAttrs()) ?>>
+                <label for="<?= $toggleId ?>" <?= attr($block->navTogglerAttrs()) ?>>
                     <span class="nav-toggler__closed">
                         <?= $block->menuIconClosed() ?>
                     </span>
                     <span class="nav-toggler__open">
                         <?= $block->menuIconOpen() ?>
                     </span>
-                </a>
+                </label>
             </li>
         </ul>
     <?php endif ?>
