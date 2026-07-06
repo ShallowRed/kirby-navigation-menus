@@ -21,7 +21,7 @@ $toggleId = 'nav-toggle-' . $block->id();
     <?php endif ?>
 
     <ul class="nav-items" id="<?= $block->getUniqueNavId() ?>">
-        <?php foreach ($block->content()->items()->toBlocks() as $item): ?>
+        <?php foreach ($block->items() as $item): ?>
             <li><?= $item ?></li>
         <?php endforeach ?>
     </ul>

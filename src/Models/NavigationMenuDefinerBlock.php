@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ShallowRed\NavigationMenus\Models;
 
 use Kirby\Cms\Block;
+use ShallowRed\NavigationMenus\Navigation\NavigationHelper;
 use ShallowRed\NavigationMenus\Utils\Config;
 use Exception;
 
@@ -16,6 +17,14 @@ use Exception;
  */
 class NavigationMenuDefinerBlock extends Block
 {
+    /**
+     * Get navigation items as blocks, tolerating legacy content format
+     */
+    public function items(): \Kirby\Cms\Blocks
+    {
+        return NavigationHelper::fieldToBlocks($this->content()->items());
+    }
+
     /**
      * Check if this is a breadcrumb navigation
      */

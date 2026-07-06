@@ -21,6 +21,35 @@ use ShallowRed\NavigationMenus\Utils\UrlValidator;
 final class NavigationHelper
 {
     /**
+     * Convert a blocks field to Blocks, normalizing legacy entries whose
+     * fields are stored at the top level instead of inside a `content` key.
+     * Kirby 4 hoisted those automatically, Kirby 5 no longer does.
+     */
+    public static function fieldToBlocks(ContentField $field): \Kirby\Cms\Blocks
+    {
+        $raw = \Kirby\Data\Json::decode($field->value() ?? '[]');
+
+        if (is_array($raw) === false) {
+            return $field->toBlocks();
+        }
+
+        $meta = ['id' => true, 'isHidden' => true, 'type' => true];
+        $normalized = array_map(function ($item) use ($meta) {
+            if (is_array($item) && isset($item['content']) === false) {
+                return array_intersect_key($item, $meta) + [
+                    'content' => array_diff_key($item, $meta),
+                ];
+            }
+            return $item;
+        }, $raw);
+
+        return \Kirby\Cms\Blocks::factory($normalized, [
+            'parent' => $field->parent(),
+            'field'  => $field,
+        ]);
+    }
+
+    /**
      * Get navigation menu by key
      */
     public static function getMenu(string $key): ?ContentField
