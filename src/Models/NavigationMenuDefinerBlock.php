@@ -164,8 +164,8 @@ class NavigationMenuDefinerBlock extends Block
      */
     public function getUniqueNavId(): string
     {
-        // If user provided a custom ID, use it
-        $customId = $this->content()->navId()->toString();
+        // The blueprint field is named `id`; read it from content, since $this->id() is the block id
+        $customId = $this->content()->get('id')->toString();
         if (!empty($customId)) {
             return $customId;
         }
