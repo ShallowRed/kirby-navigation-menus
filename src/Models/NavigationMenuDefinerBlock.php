@@ -156,10 +156,6 @@ class NavigationMenuDefinerBlock extends Block
             $attrs['aria-label'] = 'Navigation';
         }
 
-        // Always add ID for navigation - required for accessibility and mobile navigation
-        $navId = $this->getUniqueNavId();
-        $attrs['id'] = htmlspecialchars($navId, ENT_QUOTES, 'UTF-8');
-
         return $attrs;
     }
 
