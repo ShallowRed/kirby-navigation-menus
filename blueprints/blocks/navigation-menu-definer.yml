@@ -36,6 +36,7 @@ fields:
     label: shallowred.navigation-menus.field.nav-items.label
     type: blocks
     fieldsets:
+      - link
       - button
       - nav-dropdown
   ariaLabel:

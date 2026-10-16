@@ -15,7 +15,13 @@ $toggleId = 'nav-toggle-' . $block->id();
     <?php if ($block->content()->brand()->isNotEmpty()): ?>
         <ul class="nav-brand">
             <li>
-                <?= $block->content()->brand()->toBlocks() ?>
+                <?php if ($block->shouldBrandBeLinked()): ?>
+                    <a <?= attr($block->getBrandLinkAttrs()) ?>>
+                        <?= $block->content()->brand()->toBlocks() ?>
+                    </a>
+                <?php else: ?>
+                    <?= $block->content()->brand()->toBlocks() ?>
+                <?php endif ?>
             </li>
         </ul>
     <?php endif ?>
