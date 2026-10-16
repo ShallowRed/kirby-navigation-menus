@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace ShallowRed\NavigationMenus\Navigation;
 
 use Kirby\Cms\App;
+use Kirby\Cms\Block;
 use Kirby\Cms\Page;
 use Kirby\Cms\Pages;
 use Kirby\Cms\Field;
 use Kirby\Content\Field as ContentField;
+use ShallowRed\NavigationMenus\Models\NavigationMenuDefinerBlock;
 use ShallowRed\NavigationMenus\Utils\Config;
 use ShallowRed\NavigationMenus\Utils\UrlValidator;
 
@@ -81,7 +83,21 @@ final class NavigationHelper
         }
 
         try {
-            return $menu->toBlocks();
+            $blocks = $menu->toBlocks();
+            $items = new \Kirby\Cms\Blocks([], ['parent' => $blocks->parent()]);
+
+            foreach ($blocks as $block) {
+                if ($block instanceof NavigationMenuDefinerBlock) {
+                    foreach ($block->items() as $item) {
+                        $items->append($item->id(), $item);
+                    }
+                    continue;
+                }
+
+                $items->append($block->id(), $block);
+            }
+
+            return $items;
         } catch (\Exception $e) {
             if (Config::getDebug()['log-errors']) {
                 error_log("NavigationMenus: Error getting nav pages for '{$key}': " . $e->getMessage());
@@ -259,7 +275,7 @@ final class NavigationHelper
         }
 
         $currentIndex = null;
-        foreach ($pages as $index => $navPage) {
+        foreach ($pages->values() as $index => $navPage) {
             if ($navPage->is($page)) {
                 $currentIndex = $index;
                 break;
@@ -289,6 +305,11 @@ final class NavigationHelper
      */
     private static function getPageFromNavItem(object $navItem): ?Page
     {
+        // Block fields are resolved through magic calls, invisible to method_exists()
+        if ($navItem instanceof Block) {
+            return $navItem->content()->get('link')->toPage();
+        }
+
         // Handle different nav item structures
         if (method_exists($navItem, 'link')) {
             $link = $navItem->link();
