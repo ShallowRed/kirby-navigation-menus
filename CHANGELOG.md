@@ -26,6 +26,7 @@ All notable changes to this plugin are documented in this file. The format follo
 - Blocks saved without a `content` wrapper by Kirby 4 render under Kirby 5.
 - `$page->isInMenu()`, `prevInMenu()` and `nextInMenu()` find the pages linked from the items of a `navigation-menu-definer` block, and `site()->navPages()` returns those items.
 - The menu id is set on the `ul.nav-items` list only, the element that the toggler's `aria-controls` targets. The wrapping `<nav>` has no id.
+- The id entered in the `id` field of a `navigation-menu-definer` block is used for the menu list. When the field is empty, the id is the menu key followed by `-nav`.
 
 ## [0.1.5](https://github.com/ShallowRed/kirby-navigation-menus/releases/tag/0.1.5)
 
